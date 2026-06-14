@@ -47,3 +47,5 @@ Backend update 46: backend: add graceful handling for invalid objectid route par
 Backend update 47: backend: normalize boolean query flags across listing endpoints
 Backend update 48: backend: improve auth logout handling for stateless token clients
 Backend update 49: backend: add health check route with db readiness signal
+Backend update 50: backend: enhance seed data realism for bookings and vehicles
+Backend update 51: backend: add controller guards for unsupported booking statuses
