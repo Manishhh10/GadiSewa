@@ -45,3 +45,5 @@ Backend update 44: backend: add admin action audit trail fields to response meta
 Backend update 45: backend: improve vendor approval flow status synchronization
 Backend update 46: backend: add graceful handling for invalid objectid route params
 Backend update 47: backend: normalize boolean query flags across listing endpoints
+Backend update 48: backend: improve auth logout handling for stateless token clients
+Backend update 49: backend: add health check route with db readiness signal
