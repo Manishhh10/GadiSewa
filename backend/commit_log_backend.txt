@@ -41,3 +41,5 @@ Backend update 40: backend: add booking conflict diagnostics in application logs
 Backend update 41: backend: improve controller-level try-catch consistency
 Backend update 42: backend: add vehicle image array normalization on write
 Backend update 43: backend: enforce minimum rental duration in booking validation
+Backend update 44: backend: add admin action audit trail fields to response metadata
+Backend update 45: backend: improve vendor approval flow status synchronization
