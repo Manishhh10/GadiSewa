@@ -39,3 +39,5 @@ Backend update 25: backend: improve seed script idempotency for local developmen
 Backend update 26: backend: add route-level input validation for auth endpoints
 Backend update 40: backend: add booking conflict diagnostics in application logs
 Backend update 41: backend: improve controller-level try-catch consistency
+Backend update 42: backend: add vehicle image array normalization on write
+Backend update 43: backend: enforce minimum rental duration in booking validation
