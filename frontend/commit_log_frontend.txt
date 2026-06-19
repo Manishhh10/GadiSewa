@@ -37,3 +37,4 @@ Frontend update 36: frontend: add host analytics charts with responsive card lay
 Frontend update 37: frontend: implement language selector scaffold and translation keys
 Frontend update 38: frontend: add framer-motion transitions for page and modal entry
 Frontend update 39: frontend: clean unused assets and split heavy dashboard components
+Frontend update 40: frontend: document current frontend route structure and access rules
