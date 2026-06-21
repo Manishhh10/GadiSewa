@@ -35,3 +35,5 @@ Frontend update 34: frontend: add tooltip hints for disabled booking actions
 Frontend update 35: frontend: refactor vehicle image carousel with touch swipe support
 Frontend update 36: frontend: add host analytics charts with responsive card layout
 Frontend update 37: frontend: implement language selector scaffold and translation keys
+Frontend update 38: frontend: add framer-motion transitions for page and modal entry
+Frontend update 39: frontend: clean unused assets and split heavy dashboard components
