@@ -33,3 +33,5 @@ Frontend update 32: frontend: add copy booking link action with clipboard fallba
 Frontend update 33: frontend: implement offline banner reacting to network status changes
 Frontend update 34: frontend: add tooltip hints for disabled booking actions
 Frontend update 35: frontend: refactor vehicle image carousel with touch swipe support
+Frontend update 36: frontend: add host analytics charts with responsive card layout
+Frontend update 37: frontend: implement language selector scaffold and translation keys
