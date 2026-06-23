@@ -1,3 +1,5 @@
 Frontend update 31: frontend: sprint workflow update 31/40
 Frontend update 32: frontend: sprint workflow update 32/40
 Frontend update 33: frontend: sprint workflow update 33/40
+Frontend update 34: frontend: sprint workflow update 34/40
+Frontend update 35: frontend: sprint workflow update 35/40
