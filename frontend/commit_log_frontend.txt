@@ -29,3 +29,5 @@ Frontend update 18: frontend: add reusable error banner component for api reques
 Frontend update 19: frontend: implement optimistic ui update for booking status changes
 Frontend update 20: frontend: add pagination and sort controls to admin listings view
 Frontend update 31: frontend: prevent double submission on payment and booking forms
+Frontend update 32: frontend: add copy booking link action with clipboard fallback
+Frontend update 33: frontend: implement offline banner reacting to network status changes
