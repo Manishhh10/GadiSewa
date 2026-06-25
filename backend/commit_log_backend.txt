@@ -9,3 +9,5 @@ Backend update 34: backend: sprint workflow update 34/52
 Backend update 35: backend: sprint workflow update 35/52
 Backend update 36: backend: sprint workflow update 36/52
 Backend update 37: backend: sprint workflow update 37/52
+Backend update 38: backend: sprint workflow update 38/52
+Backend update 39: backend: sprint workflow update 39/52
