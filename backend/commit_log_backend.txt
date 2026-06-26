@@ -46,3 +46,5 @@ Backend update 32: backend: normalize date parsing in booking availability endpo
 Backend update 33: backend: improve mongoose model defaults for booking timestamps
 Backend update 34: backend: add defensive null checks in stats aggregation pipeline
 Backend update 35: backend: optimize vendor route response payload size
+Backend update 36: backend: add consistent api envelope for success responses
+Backend update 37: backend: improve auth controller otp verification error states
