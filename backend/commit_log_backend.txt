@@ -44,3 +44,5 @@ Backend update 30: backend: improve booking controller cancellation edge-case ha
 Backend update 31: backend: add admin metrics for pending approvals and disputes
 Backend update 32: backend: normalize date parsing in booking availability endpoints
 Backend update 33: backend: improve mongoose model defaults for booking timestamps
+Backend update 34: backend: add defensive null checks in stats aggregation pipeline
+Backend update 35: backend: optimize vendor route response payload size
