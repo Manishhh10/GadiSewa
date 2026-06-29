@@ -40,3 +40,5 @@ Backend update 26: backend: add route-level input validation for auth endpoints
 Backend update 27: backend: add validation for vendor application document metadata
 Backend update 28: backend: enforce numeric range checks for vehicle deposit amount
 Backend update 29: backend: add sorting options to vehicle listing endpoint
+Backend update 30: backend: improve booking controller cancellation edge-case handling
+Backend update 31: backend: add admin metrics for pending approvals and disputes
