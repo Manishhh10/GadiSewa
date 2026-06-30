@@ -38,3 +38,5 @@ Backend update 24: backend: add schema indexes for booking and vehicle lookups
 Backend update 25: backend: improve seed script idempotency for local development
 Backend update 26: backend: add route-level input validation for auth endpoints
 Backend update 27: backend: add validation for vendor application document metadata
+Backend update 28: backend: enforce numeric range checks for vehicle deposit amount
+Backend update 29: backend: add sorting options to vehicle listing endpoint
