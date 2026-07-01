@@ -37,3 +37,4 @@ Frontend update 26: frontend: integrate lucide-react icons for sidebar and quick
 Frontend update 27: frontend: add dark mode support with css variables and theme toggle
 Frontend update 28: frontend: sync theme preference with local storage and initial render
 Frontend update 29: frontend: improve contrast ratios for text and buttons in dark mode
+Frontend update 30: frontend: add password strength meter and helper hints on signup
