@@ -33,3 +33,5 @@ Frontend update 22: frontend: add vendor profile completion checklist on vendor 
 Frontend update 23: frontend: implement image lazy loading and aspect-ratio placeholders
 Frontend update 24: frontend: reduce layout shift on booking confirmation and receipt blocks
 Frontend update 25: frontend: add dispute detail page error and retry handling states
+Frontend update 26: frontend: integrate lucide-react icons for sidebar and quick actions
+Frontend update 27: frontend: add dark mode support with css variables and theme toggle
