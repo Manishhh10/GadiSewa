@@ -31,3 +31,5 @@ Frontend update 20: frontend: add pagination and sort controls to admin listings
 Frontend update 21: frontend: standardize currency and date formatting across booking pages
 Frontend update 22: frontend: add vendor profile completion checklist on vendor dashboard
 Frontend update 23: frontend: implement image lazy loading and aspect-ratio placeholders
+Frontend update 24: frontend: reduce layout shift on booking confirmation and receipt blocks
+Frontend update 25: frontend: add dispute detail page error and retry handling states
