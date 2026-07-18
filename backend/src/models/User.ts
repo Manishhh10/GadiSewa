@@ -10,6 +10,11 @@ export interface IUser extends Document {
   phone: string;
   password: string;
   role: UserRole;
+  emailVerified: boolean;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  otpCode?: string;
+  otpExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidate: string): Promise<boolean>;
@@ -45,6 +50,11 @@ const userSchema = new Schema<IUser>(
       enum: ['renter', 'vendor', 'admin'],
       default: 'renter',
     },
+    emailVerified: { type: Boolean, default: false },
+    passwordResetToken: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
+    otpCode: { type: String, select: false },
+    otpExpires: { type: Date, select: false },
   },
   { timestamps: true }
 );

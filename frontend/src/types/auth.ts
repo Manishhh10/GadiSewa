@@ -6,6 +6,7 @@ export interface User {
   username: string;
   fullName?: string;
   role: UserRole;
+  emailVerified?: boolean;
 }
 
 export interface RegisterPayload {

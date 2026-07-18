@@ -34,4 +34,27 @@ export const authApi = {
     const { data } = await http.get<ApiResponse<{ user: User }>>(ENDPOINTS.AUTH.ME);
     return data.data.user;
   },
+
+  forgotPassword: async (email: string): Promise<string> => {
+    const { data } = await http.post<ApiResponse<null>>(ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
+    return data.message;
+  },
+
+  resetPassword: async (token: string, password: string): Promise<string> => {
+    const { data } = await http.post<ApiResponse<null>>(ENDPOINTS.AUTH.RESET_PASSWORD, {
+      token,
+      password,
+    });
+    return data.message;
+  },
+
+  sendOtp: async (): Promise<string> => {
+    const { data } = await http.post<ApiResponse<null>>(ENDPOINTS.AUTH.SEND_OTP);
+    return data.message;
+  },
+
+  verifyOtp: async (code: string): Promise<string> => {
+    const { data } = await http.post<ApiResponse<null>>(ENDPOINTS.AUTH.VERIFY_OTP, { code });
+    return data.message;
+  },
 };
