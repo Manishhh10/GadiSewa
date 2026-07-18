@@ -98,25 +98,55 @@ Open <http://localhost:3000>, go to **Sign Up**, create an account, and you are
 redirected home. The JWT is stored in `localStorage` and auto-attached to every
 request by the axios interceptor.
 
+Run `npm run seed` in `backend/` to populate sample vehicles and bootstrap an
+admin account (`admin@gadisewa.com` / `Admin@12345` — change this before any
+real deployment).
+
+### Optional environment variables
+
+- **eSewa payments**: works out of the box against eSewa's public UAT/sandbox
+  merchant (`ESEWA_MERCHANT_CODE=EPAYTEST` etc. in `backend/.env.example`) —
+  no setup needed, no real money moves. Pay with test ID `9711111111` /
+  password `Nepal@123` / MPIN `1122`. Swap in real merchant credentials for
+  production.
+- **Email (password reset / OTP)**: set `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/
+  `SMTP_PASS`/`SMTP_FROM` in `backend/.env` (a Gmail "App Password" works).
+  Without SMTP configured, emails are logged to the backend console instead
+  of being sent — the rest of the app still works.
+
 ---
+
+## Feature overview
+
+- **Auth**: register/login, JWT + role (`renter`/`vendor`/`admin`) reissued
+  live from the DB on every request, forgot-password + reset-password, email
+  OTP verification — all via real email.
+- **Vehicles**: search/filter by type, location, price range and date
+  availability; vendors can create, edit and delete their own listings.
+- **Bookings**: double-booking prevention, vendor accept/decline/complete
+  with an enforced status-transition table, renter cancellation.
+- **Payments**: real eSewa ePay v2 sandbox integration — signed redirect,
+  signature-verified callback, idempotent.
+- **Reviews**: renters review completed bookings; vehicle ratings are
+  computed live; admins can hide/restore reviews.
+- **Vendor tools**: apply → admin-approved → list vehicles → manage
+  bookings, all backed by real endpoints.
+- **Admin**: moderate vendor applications, vehicle listings, reviews, and
+  disputes; a report-issue flow that auto-opens a dispute when it
+  references a real booking; a damage checklist persisted per booking.
+- **i18n**: English/Nepali toggle (persisted), covering the core
+  renter/auth/booking flows.
 
 ## API
 
-| Method | Endpoint             | Body                                          |
-| ------ | -------------------- | --------------------------------------------- |
-| GET    | `/api/health`        | —                                             |
-| POST   | `/api/auth/register` | `{ email, username, password, confirmPassword }` |
-| POST   | `/api/auth/login`    | `{ email, password }`                         |
-
-Success envelope:
+All endpoints are namespaced under `/api` and return the envelope:
 
 ```json
-{ "success": true, "message": "...", "data": { "token": "...", "user": { "id": "...", "email": "...", "username": "..." } } }
+{ "success": true, "message": "...", "data": { ... } }
 ```
 
----
-
-## Next steps (not yet built)
-This is the **auth foundation**. The remaining 58 Stitch screens (home, vehicle
-details, booking, eSewa payment, vendor + admin dashboards, etc.) can be added
-screen-by-screen using the same layered pattern.
+See `backend/src/routes/index.ts` for the full route map — `auth`,
+`vehicles` (incl. `/mine`, `/:id/reviews`), `bookings` (incl. `/vendor`,
+`/:id/status`, `/:id/cancel`, `/:id/checklist`, `/:id/esewa/initiate`),
+`vendor`, `admin` (applications/vehicles/reviews/issues/disputes),
+`reviews`, `payments/esewa/{success,failure}`, and `issues`.
