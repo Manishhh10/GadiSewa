@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
@@ -10,9 +10,27 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchVehicleById } from '@/store/actions/vehicleActions';
 import { clearSelected } from '@/store/slices/vehicleSlice';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { reviewApi } from '@/api/review.api';
 import type { Vehicle } from '@/types/vehicle';
+import type { Review } from '@/types/review';
 
 const FILLED = { fontVariationSettings: "'FILL' 1" } as const;
+
+function ReviewStars({ n }: { n: number }) {
+  return (
+    <span className="flex items-center text-primary">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span
+          key={i}
+          className="material-symbols-outlined text-[16px]"
+          style={{ fontVariationSettings: i < n ? "'FILL' 1" : "'FILL' 0" }}
+        >
+          star
+        </span>
+      ))}
+    </span>
+  );
+}
 
 export default function VehicleDetailsPage() {
   const params = useParams();
@@ -24,9 +42,11 @@ export default function VehicleDetailsPage() {
     selectedLoading: loading,
     selectedError: error,
   } = useAppSelector((s) => s.vehicles);
+  const [reviews, setReviews] = useState<Review[]>([]);
 
   useEffect(() => {
     dispatch(fetchVehicleById(id));
+    reviewApi.forVehicle(id).then(setReviews).catch(() => {});
     return () => {
       dispatch(clearSelected());
     };
@@ -204,6 +224,35 @@ export default function VehicleDetailsPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Reviews */}
+                <div className="border-t border-outline-variant pt-8 mt-8">
+                  <h2 className="font-headline-sm text-headline-sm mb-3">
+                    {t('vehicleDetail.reviewsHeading')} {reviews.length > 0 && `(${reviews.length})`}
+                  </h2>
+                  {reviews.length === 0 ? (
+                    <p className="font-body-md text-body-md text-on-surface-variant">
+                      {t('vehicleDetail.noReviews')}
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {reviews.map((r) => {
+                        const author = typeof r.user === 'object' ? r.user.fullName || r.user.username : 'Renter';
+                        return (
+                          <div key={r._id} className="bg-surface-container-low p-5 rounded-xl">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-label-md text-label-md text-on-surface">{author}</span>
+                              <ReviewStars n={r.rating} />
+                            </div>
+                            {r.comment && (
+                              <p className="font-body-sm text-body-sm text-on-surface-variant">{r.comment}</p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Right column */}

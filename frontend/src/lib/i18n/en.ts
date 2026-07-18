@@ -116,6 +116,8 @@ const en = {
     verifiedHost: 'Verified Host',
     memberSince: 'Member since',
     contactHost: 'Contact Host',
+    reviewsHeading: 'Reviews',
+    noReviews: 'No reviews yet — be the first to rate this vehicle after your trip.',
   },
   bookingPanel: {
     bestPrice: 'Best Price',

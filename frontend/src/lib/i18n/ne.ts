@@ -118,6 +118,8 @@ const ne: Dictionary = {
     verifiedHost: 'प्रमाणित होस्ट',
     memberSince: 'देखि सदस्य',
     contactHost: 'होस्टलाई सम्पर्क गर्नुहोस्',
+    reviewsHeading: 'समीक्षाहरू',
+    noReviews: 'अहिलेसम्म कुनै समीक्षा छैन — आफ्नो यात्रा पछि यो सवारी साधन मूल्याङ्कन गर्ने पहिलो व्यक्ति बन्नुहोस्।',
   },
   bookingPanel: {
     bestPrice: 'उत्तम मूल्य',

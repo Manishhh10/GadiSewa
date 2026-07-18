@@ -5,6 +5,7 @@ import bookingRoutes from './booking.routes';
 import statsRoutes from './stats.routes';
 import vendorRoutes from './vendor.routes';
 import adminRoutes from './admin.routes';
+import reviewRoutes from './review.routes';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/bookings', bookingRoutes);
 router.use('/stats', statsRoutes);
 router.use('/vendor', vendorRoutes);
 router.use('/admin', adminRoutes);
+router.use('/reviews', reviewRoutes);
 
 export default router;

@@ -37,5 +37,11 @@ export const ENDPOINTS = {
     APPLICATION: (id: string) => `/api/admin/applications/${id}`,
     VEHICLES: '/api/admin/vehicles',
     VERIFY_VEHICLE: (id: string) => `/api/admin/vehicles/${id}/verify`,
+    REVIEWS: '/api/admin/reviews',
+    REVIEW: (id: string) => `/api/admin/reviews/${id}`,
+  },
+  REVIEWS: {
+    CREATE: '/api/reviews',
+    FOR_VEHICLE: (vehicleId: string) => `/api/vehicles/${vehicleId}/reviews`,
   },
 } as const;
