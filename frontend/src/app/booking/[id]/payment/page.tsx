@@ -1,0 +1,158 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchBookingById, payBooking } from '@/store/actions/bookingActions';
+import { fmtDate, rs } from '@/lib/format';
+
+const FILLED = { fontVariationSettings: "'FILL' 1" } as const;
+
+export default function PaymentPage() {
+  const params = useParams();
+  const id = String(params.id);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { current: b, loading, saving, error } = useAppSelector((s) => s.bookings);
+
+  useEffect(() => {
+    dispatch(fetchBookingById(id));
+  }, [dispatch, id]);
+
+  const onPay = async () => {
+    const res = await dispatch(payBooking(id));
+    if (payBooking.fulfilled.match(res)) {
+      router.push(`/booking/${id}/success`);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navbar />
+      <main className="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-8">
+        <div className="flex items-center gap-1 mb-8 text-on-surface-variant font-body-sm text-body-sm">
+          <span>Details</span>
+          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+          <span>Review</span>
+          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+          <span className="text-primary font-semibold">Payment</span>
+        </div>
+
+        {loading && <p className="font-body-md text-on-surface-variant">Loading…</p>}
+        {error && !loading && (
+          <div className="bg-error-container text-on-error-container px-4 py-3 rounded-lg font-body-md">{error}</div>
+        )}
+
+        {b && !loading && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Payment box */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-sm">
+                <div className="flex flex-col items-center text-center mb-8">
+                  <div className="w-20 h-20 mb-4 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-outline-variant">
+                    <span className="text-[#41a124] font-extrabold italic text-3xl">eSewa</span>
+                  </div>
+                  <h1 className="font-headline-lg text-headline-lg mb-1">Secure Payment</h1>
+                  <p className="text-on-surface-variant font-body-md text-body-md max-w-md">
+                    Complete your transaction via eSewa&apos;s secure payment gateway.
+                  </p>
+                </div>
+
+                <div className="bg-surface-container p-6 rounded-lg border border-outline-variant flex flex-col items-center gap-4">
+                  <div className="flex items-center gap-2 bg-surface-bright px-4 py-1 rounded-full border border-primary-container/20">
+                    <span className="material-symbols-outlined text-primary text-[20px]" style={FILLED}>verified_user</span>
+                    <span className="text-primary font-label-md text-label-md">Verified Secure Transaction</span>
+                  </div>
+                  <div className="w-full h-px bg-outline-variant" />
+                  <div className="flex flex-col gap-2 w-full">
+                    <Row label="Merchant" value="GadiSewa Vehicle Rentals" />
+                    <Row label="Booking Ref" value={b.bookingRef} />
+                    <Row label="Amount" value={rs(b.totalAmount)} strong />
+                  </div>
+
+                  {b.paymentStatus === 'paid' ? (
+                    <Link
+                      href={`/booking/${id}/success`}
+                      className="w-full text-center bg-primary-container text-white py-4 rounded-lg font-headline-sm text-headline-sm hover:brightness-110 transition-all mt-2"
+                    >
+                      Already paid — View Receipt
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={onPay}
+                      disabled={saving}
+                      className="w-full bg-primary-container text-white py-4 rounded-lg font-headline-sm text-headline-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60 mt-2"
+                    >
+                      {saving ? (
+                        <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+                      ) : (
+                        <>
+                          <span>Pay {rs(b.totalAmount)} with eSewa</span>
+                          <span className="material-symbols-outlined">payments</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    <span className="material-symbols-outlined text-[14px] align-middle">info</span>{' '}
+                    Demo gateway — clicking pay simulates a successful eSewa transaction.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Order summary */}
+            <aside className="lg:col-span-5 sticky top-24">
+              <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+                <div className="relative h-48 w-full bg-surface-container">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
+                  <div className="absolute top-4 right-4 bg-on-surface/80 backdrop-blur-md text-surface px-3 py-1 rounded-full font-label-md text-label-md">
+                    {b.vehicle.type}
+                  </div>
+                </div>
+                <div className="p-6 space-y-4">
+                  <h2 className="font-headline-md text-headline-md">{b.vehicle.name}</h2>
+                  <SummaryRow icon="calendar_today" label="Rental Dates" value={`${fmtDate(b.pickupDate)} — ${fmtDate(b.returnDate)}`} />
+                  <SummaryRow icon="location_on" label="Pickup Location" value={b.pickupLocation} />
+                  <SummaryRow icon="schedule" label="Duration" value={`${b.days} days`} />
+                  <div className="border-t border-outline-variant pt-4 flex justify-between items-baseline">
+                    <span className="font-headline-sm text-headline-sm">Total</span>
+                    <span className="font-headline-md text-headline-md text-primary">{rs(b.totalAmount)}</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        )}
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex justify-between items-center text-on-surface-variant font-body-sm text-body-sm">
+      <span>{label}</span>
+      <span className={strong ? 'font-bold text-primary text-body-md' : 'font-semibold text-on-surface'}>{value}</span>
+    </div>
+  );
+}
+
+function SummaryRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="bg-surface-container p-2 rounded-lg">
+        <span className="material-symbols-outlined text-on-surface-variant">{icon}</span>
+      </div>
+      <div>
+        <p className="font-body-sm text-body-sm text-on-surface-variant">{label}</p>
+        <p className="font-body-md text-body-md font-semibold">{value}</p>
+      </div>
+    </div>
+  );
+}
