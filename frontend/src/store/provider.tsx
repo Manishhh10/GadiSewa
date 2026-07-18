@@ -7,6 +7,7 @@ import { useAppDispatch } from './hooks';
 import { fetchMe } from './actions/authActions';
 import { authInitialized } from './slices/authSlice';
 import { TOKEN_KEY } from '@/lib/axios';
+import { I18nProvider } from '@/lib/i18n/I18nContext';
 
 /** On app load, rehydrate the user from the stored token (if any). */
 function AuthBootstrap() {
@@ -24,8 +25,10 @@ function AuthBootstrap() {
 export function ReduxProvider({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
-      <AuthBootstrap />
-      {children}
+      <I18nProvider>
+        <AuthBootstrap />
+        {children}
+      </I18nProvider>
     </Provider>
   );
 }

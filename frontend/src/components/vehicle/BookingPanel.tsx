@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { createBooking } from '@/store/actions/bookingActions';
 import { rs } from '@/lib/format';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 import type { Vehicle } from '@/types/vehicle';
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -20,6 +21,7 @@ const CLEANING_FEE = 500;
 export default function BookingPanel({ vehicle }: { vehicle: Vehicle }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const user = useAppSelector((s) => s.auth.user);
   const saving = useAppSelector((s) => s.bookings.saving);
   const error = useAppSelector((s) => s.bookings.error);
@@ -62,10 +64,10 @@ export default function BookingPanel({ vehicle }: { vehicle: Vehicle }) {
           <span className="font-headline-lg text-headline-lg text-on-surface">
             {rs(vehicle.dailyRate)}
           </span>
-          <span className="font-body-sm text-body-sm text-on-surface-variant"> / day</span>
+          <span className="font-body-sm text-body-sm text-on-surface-variant"> {t('common.perDay')}</span>
         </div>
         <div className="bg-tertiary-container/20 text-tertiary px-3 py-1 rounded font-label-md text-label-md flex items-center gap-1">
-          <span className="material-symbols-outlined text-[14px]">shield</span> Best Price
+          <span className="material-symbols-outlined text-[14px]">shield</span> {t('bookingPanel.bestPrice')}
         </div>
       </div>
 
@@ -73,14 +75,14 @@ export default function BookingPanel({ vehicle }: { vehicle: Vehicle }) {
         <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
           check_circle
         </span>
-        What You See Is What You Pay
+        {t('bookingPanel.whatYouSeeIsWhatYouPay')}
       </div>
 
       <div className="mb-6">
-        <label className="font-body-sm text-body-sm text-outline block mb-1">Trip Dates</label>
+        <label className="font-body-sm text-body-sm text-outline block mb-1">{t('bookingPanel.tripDates')}</label>
         <div className="flex border border-outline-variant rounded-lg overflow-hidden">
           <div className="flex-1 p-2 border-r border-outline-variant">
-            <p className="font-body-sm text-body-sm text-outline">Pickup</p>
+            <p className="font-body-sm text-body-sm text-outline">{t('bookingPanel.pickup')}</p>
             <input
               type="date"
               value={pickup}
@@ -90,7 +92,7 @@ export default function BookingPanel({ vehicle }: { vehicle: Vehicle }) {
             />
           </div>
           <div className="flex-1 p-2">
-            <p className="font-body-sm text-body-sm text-outline">Return</p>
+            <p className="font-body-sm text-body-sm text-outline">{t('bookingPanel.return')}</p>
             <input
               type="date"
               value={ret}
@@ -101,20 +103,20 @@ export default function BookingPanel({ vehicle }: { vehicle: Vehicle }) {
           </div>
         </div>
         <p className="text-right font-body-sm text-body-sm text-primary font-semibold mt-1">
-          Total Duration: {days} {days === 1 ? 'Day' : 'Days'}
+          {t('bookingPanel.totalDuration')} {days} {days === 1 ? t('bookingPanel.day') : t('bookingPanel.days')}
         </p>
       </div>
 
       <div className="space-y-2 mb-6">
-        <Row label={`Base Rate (${rs(vehicle.dailyRate)} × ${days})`} value={rs(base)} />
-        <Row label="Service Fee" value={rs(serviceFee)} />
-        <Row label="Cleaning & Sanitize Fee" value={rs(CLEANING_FEE)} />
+        <Row label={`${t('bookingPanel.baseRate')} (${rs(vehicle.dailyRate)} × ${days})`} value={rs(base)} />
+        <Row label={t('bookingPanel.serviceFee')} value={rs(serviceFee)} />
+        <Row label={t('bookingPanel.cleaningFee')} value={rs(CLEANING_FEE)} />
         <div className="flex justify-between font-body-sm text-body-sm">
-          <span className="text-on-surface-variant">Insurance (Standard)</span>
-          <span className="text-tertiary font-semibold">FREE</span>
+          <span className="text-on-surface-variant">{t('bookingPanel.insurance')}</span>
+          <span className="text-tertiary font-semibold">{t('common.free')}</span>
         </div>
         <div className="border-t border-outline-variant pt-2 mt-2 flex justify-between items-baseline">
-          <span className="font-headline-sm text-headline-sm">Total Estimate</span>
+          <span className="font-headline-sm text-headline-sm">{t('bookingPanel.totalEstimate')}</span>
           <span className="font-headline-sm text-headline-sm text-primary">{rs(total)}</span>
         </div>
       </div>
@@ -133,14 +135,14 @@ export default function BookingPanel({ vehicle }: { vehicle: Vehicle }) {
         {saving ? (
           <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
         ) : user ? (
-          'Book Now'
+          t('bookingPanel.bookNow')
         ) : (
-          'Login to Book'
+          t('bookingPanel.loginToBook')
         )}
       </button>
 
       <p className="text-center font-body-sm text-body-sm text-on-surface-variant mt-3">
-        No hidden charges. 24h grace period.
+        {t('bookingPanel.noHiddenCharges')}
       </p>
     </div>
   );

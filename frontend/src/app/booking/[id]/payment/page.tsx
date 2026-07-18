@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchBookingById, payBooking } from '@/store/actions/bookingActions';
 import { fmtDate, rs } from '@/lib/format';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 const FILLED = { fontVariationSettings: "'FILL' 1" } as const;
 
@@ -16,6 +17,7 @@ export default function PaymentPage() {
   const id = String(params.id);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { current: b, loading, saving, error } = useAppSelector((s) => s.bookings);
 
   useEffect(() => {
@@ -34,11 +36,11 @@ export default function PaymentPage() {
       <Navbar />
       <main className="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-8">
         <div className="flex items-center gap-1 mb-8 text-on-surface-variant font-body-sm text-body-sm">
-          <span>Details</span>
+          <span>{t('payment.detailsStep')}</span>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span>Review</span>
+          <span>{t('payment.reviewStep')}</span>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span className="text-primary font-semibold">Payment</span>
+          <span className="text-primary font-semibold">{t('payment.paymentStep')}</span>
         </div>
 
         {loading && <p className="font-body-md text-on-surface-variant">Loading…</p>}
@@ -55,22 +57,22 @@ export default function PaymentPage() {
                   <div className="w-20 h-20 mb-4 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-outline-variant">
                     <span className="text-[#41a124] font-extrabold italic text-3xl">eSewa</span>
                   </div>
-                  <h1 className="font-headline-lg text-headline-lg mb-1">Secure Payment</h1>
+                  <h1 className="font-headline-lg text-headline-lg mb-1">{t('payment.securePayment')}</h1>
                   <p className="text-on-surface-variant font-body-md text-body-md max-w-md">
-                    Complete your transaction via eSewa&apos;s secure payment gateway.
+                    {t('payment.completeTransaction')}
                   </p>
                 </div>
 
                 <div className="bg-surface-container p-6 rounded-lg border border-outline-variant flex flex-col items-center gap-4">
                   <div className="flex items-center gap-2 bg-surface-bright px-4 py-1 rounded-full border border-primary-container/20">
                     <span className="material-symbols-outlined text-primary text-[20px]" style={FILLED}>verified_user</span>
-                    <span className="text-primary font-label-md text-label-md">Verified Secure Transaction</span>
+                    <span className="text-primary font-label-md text-label-md">{t('payment.verifiedSecureTransaction')}</span>
                   </div>
                   <div className="w-full h-px bg-outline-variant" />
                   <div className="flex flex-col gap-2 w-full">
-                    <Row label="Merchant" value="GadiSewa Vehicle Rentals" />
-                    <Row label="Booking Ref" value={b.bookingRef} />
-                    <Row label="Amount" value={rs(b.totalAmount)} strong />
+                    <Row label={t('payment.merchant')} value="GadiSewa Vehicle Rentals" />
+                    <Row label={t('payment.bookingRef')} value={b.bookingRef} />
+                    <Row label={t('payment.amount')} value={rs(b.totalAmount)} strong />
                   </div>
 
                   {b.paymentStatus === 'paid' ? (
@@ -78,7 +80,7 @@ export default function PaymentPage() {
                       href={`/booking/${id}/success`}
                       className="w-full text-center bg-primary-container text-white py-4 rounded-lg font-headline-sm text-headline-sm hover:brightness-110 transition-all mt-2"
                     >
-                      Already paid — View Receipt
+                      {t('payment.alreadyPaid')}
                     </Link>
                   ) : (
                     <button
@@ -90,7 +92,7 @@ export default function PaymentPage() {
                         <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
                       ) : (
                         <>
-                          <span>Pay {rs(b.totalAmount)} with eSewa</span>
+                          <span>{t('payment.payWith', { amount: rs(b.totalAmount) })}</span>
                           <span className="material-symbols-outlined">payments</span>
                         </>
                       )}
@@ -116,11 +118,11 @@ export default function PaymentPage() {
                 </div>
                 <div className="p-6 space-y-4">
                   <h2 className="font-headline-md text-headline-md">{b.vehicle.name}</h2>
-                  <SummaryRow icon="calendar_today" label="Rental Dates" value={`${fmtDate(b.pickupDate)} — ${fmtDate(b.returnDate)}`} />
-                  <SummaryRow icon="location_on" label="Pickup Location" value={b.pickupLocation} />
-                  <SummaryRow icon="schedule" label="Duration" value={`${b.days} days`} />
+                  <SummaryRow icon="calendar_today" label={t('payment.rentalDates')} value={`${fmtDate(b.pickupDate)} — ${fmtDate(b.returnDate)}`} />
+                  <SummaryRow icon="location_on" label={t('payment.pickupLocation')} value={b.pickupLocation} />
+                  <SummaryRow icon="schedule" label={t('payment.duration')} value={`${b.days} ${t('payment.daysSuffix')}`} />
                   <div className="border-t border-outline-variant pt-4 flex justify-between items-baseline">
-                    <span className="font-headline-sm text-headline-sm">Total</span>
+                    <span className="font-headline-sm text-headline-sm">{t('payment.total')}</span>
                     <span className="font-headline-md text-headline-md text-primary">{rs(b.totalAmount)}</span>
                   </div>
                 </div>

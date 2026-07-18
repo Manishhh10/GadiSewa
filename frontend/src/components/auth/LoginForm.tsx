@@ -8,11 +8,13 @@ import Button from '@/components/ui/Button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser } from '@/store/actions/authActions';
 import { clearError } from '@/store/slices/authSlice';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 import type { LoginPayload } from '@/types/auth';
 
 export default function LoginForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { t } = useTranslation();
   const { loading, error } = useAppSelector((s) => s.auth);
 
   const [form, setForm] = useState<LoginPayload>({ email: '', password: '' });
@@ -39,7 +41,7 @@ export default function LoginForm() {
       )}
 
       <Input
-        label="Email Address"
+        label={t('auth.emailLabel')}
         id="email"
         name="email"
         type="email"
@@ -50,7 +52,7 @@ export default function LoginForm() {
         required
       />
       <Input
-        label="Password"
+        label={t('auth.passwordLabel')}
         id="password"
         name="password"
         type="password"
@@ -66,19 +68,19 @@ export default function LoginForm() {
           href="/forgot-password"
           className="font-label-md text-label-md text-primary hover:underline"
         >
-          Forgot Password?
+          {t('auth.forgotPassword')}
         </Link>
       </div>
 
       <Button type="submit" loading={loading}>
-        Sign In
+        {t('auth.signIn')}
       </Button>
 
       <div className="text-center pt-stack-sm">
         <p className="font-body-md text-on-surface-variant">
-          Don&apos;t have an account?{' '}
+          {t('auth.noAccount')}{' '}
           <Link href="/register" className="text-primary font-semibold hover:underline">
-            Sign Up
+            {t('auth.signUp')}
           </Link>
         </p>
       </div>

@@ -1,19 +1,23 @@
-const items = [
-  { icon: 'verified_user', label: 'Verified Vendors', color: 'text-tertiary' },
-  { icon: 'photo_camera', label: 'Real Photos', color: 'text-primary' },
-  { icon: 'payments', label: 'Transparent Pricing', color: 'text-primary' },
-  { icon: 'account_balance_wallet', label: 'eSewa Payments', color: 'text-tertiary' },
-  { icon: 'visibility_off', label: 'No Hidden Fees', color: 'text-primary' },
-];
+'use client';
+
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 export default function WhyChoose() {
+  const { t } = useTranslation();
+
+  const items = [
+    { icon: 'verified_user', label: t('home.verifiedVendors'), color: 'text-tertiary' },
+    { icon: 'photo_camera', label: t('home.realPhotos'), color: 'text-primary' },
+    { icon: 'payments', label: t('home.transparentPricing'), color: 'text-primary' },
+    { icon: 'account_balance_wallet', label: t('home.esewaPayments'), color: 'text-tertiary' },
+    { icon: 'visibility_off', label: t('home.noHiddenFees'), color: 'text-primary' },
+  ];
+
   return (
     <section className="py-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
       <div className="text-center mb-16">
-        <h2 className="font-headline-lg text-headline-lg">Why Choose GadiSewa?</h2>
-        <p className="text-on-surface-variant font-body-md mt-2">
-          Nepal&apos;s most trusted vehicle rental network.
-        </p>
+        <h2 className="font-headline-lg text-headline-lg">{t('home.whyChooseTitle')}</h2>
+        <p className="text-on-surface-variant font-body-md mt-2">{t('home.whyChooseSubtitle')}</p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-stack-md">
         {items.map((it) => (

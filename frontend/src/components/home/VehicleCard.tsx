@@ -1,9 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import type { Vehicle } from '@/types/vehicle';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 const FILLED = { fontVariationSettings: "'FILL' 1" } as const;
 
 export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-surface rounded-xl overflow-hidden shadow-[0px_4px_12px_rgba(0,0,0,0.05)] flex flex-col group">
       <div className="relative h-48 overflow-hidden bg-surface-container">
@@ -24,7 +28,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
             <span className="material-symbols-outlined text-[14px]" style={FILLED}>
               verified
             </span>
-            Verified
+            {t('vehicleCard.verified')}
           </div>
         )}
       </div>
@@ -57,7 +61,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant">
           <div>
             <span className="text-secondary text-xs uppercase tracking-wider block">
-              Daily Rate
+              {t('vehicleCard.dailyRate')}
             </span>
             <span className="font-headline-md text-primary">
               Rs. {vehicle.dailyRate.toLocaleString()}
@@ -67,7 +71,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
             href={`/vehicles/${vehicle._id}`}
             className="bg-primary-container text-white px-6 py-3 rounded-lg font-label-md text-label-md active:scale-95 transition-transform inline-block"
           >
-            Book Now
+            {t('vehicleCard.bookNow')}
           </Link>
         </div>
       </div>

@@ -6,11 +6,13 @@ import Footer from '@/components/layout/Footer';
 import VehicleCard from '@/components/home/VehicleCard';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchVehicles } from '@/store/actions/vehicleActions';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 const TYPES = ['All', 'Bike', 'Car', 'SUV', 'Van', 'Truck'];
 
 export default function RenterDashboardPage() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { items, loading, error } = useAppSelector((s) => s.vehicles);
   const [type, setType] = useState('All');
   const [q, setQ] = useState('');
@@ -48,7 +50,7 @@ export default function RenterDashboardPage() {
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search vehicles by name…"
+                placeholder={t('dashboard.searchPlaceholder')}
                 className="bg-transparent w-full outline-none font-body-md text-body-md"
               />
             </div>
@@ -56,7 +58,7 @@ export default function RenterDashboardPage() {
               type="submit"
               className="w-full md:w-auto bg-primary-container text-white px-8 py-3 rounded-lg font-label-md text-label-md hover:brightness-110 active:scale-95 transition-all"
             >
-              Search
+              {t('dashboard.search')}
             </button>
           </form>
         </div>
@@ -66,10 +68,10 @@ export default function RenterDashboardPage() {
         {/* Filters */}
         <aside className="w-full md:w-64 shrink-0">
           <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant space-y-5 md:sticky md:top-24">
-            <h2 className="font-headline-sm text-headline-sm">Filters</h2>
+            <h2 className="font-headline-sm text-headline-sm">{t('dashboard.filters')}</h2>
             <div>
               <span className="font-label-md text-label-md text-outline uppercase tracking-wider">
-                Vehicle Type
+                {t('dashboard.vehicleTypeLabel')}
               </span>
               <div className="flex flex-wrap gap-2 mt-2">
                 {TYPES.map((t) => (
@@ -89,7 +91,7 @@ export default function RenterDashboardPage() {
             </div>
             <div>
               <span className="font-label-md text-label-md text-outline uppercase tracking-wider">
-                Price Range (NPR)
+                {t('dashboard.priceRange')}
               </span>
               <input type="range" min={500} max={15000} defaultValue={8000} className="w-full accent-primary mt-2" />
               <div className="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
@@ -103,9 +105,9 @@ export default function RenterDashboardPage() {
         {/* Listing */}
         <section className="flex-1">
           <div className="mb-6">
-            <h1 className="font-headline-lg text-headline-lg">Available Vehicles</h1>
+            <h1 className="font-headline-lg text-headline-lg">{t('dashboard.availableVehicles')}</h1>
             <p className="font-body-sm text-body-sm text-on-surface-variant">
-              {loading ? 'Searching…' : `${items.length} vehicles found`}
+              {loading ? t('dashboard.searching') : `${items.length} ${t('dashboard.vehiclesFound')}`}
             </p>
           </div>
 
@@ -124,7 +126,7 @@ export default function RenterDashboardPage() {
           )}
 
           {!loading && !error && items.length === 0 && (
-            <p className="text-on-surface-variant font-body-md">No vehicles match your filters.</p>
+            <p className="text-on-surface-variant font-body-md">{t('dashboard.noMatch')}</p>
           )}
 
           {!loading && !error && items.length > 0 && (

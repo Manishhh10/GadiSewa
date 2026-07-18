@@ -3,10 +3,12 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchVehicles } from '@/store/actions/vehicleActions';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 import VehicleCard from './VehicleCard';
 
 export default function FeaturedVehicles() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { items, loading, error } = useAppSelector((s) => s.vehicles);
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function FeaturedVehicles() {
       className="py-stack-lg px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto scroll-mt-24"
     >
       <div className="flex items-center justify-between mb-8">
-        <h2 className="font-headline-lg text-headline-lg">Featured Vehicles</h2>
+        <h2 className="font-headline-lg text-headline-lg">{t('home.featuredVehicles')}</h2>
       </div>
 
       {loading && (
@@ -38,7 +40,7 @@ export default function FeaturedVehicles() {
 
       {!loading && !error && items.length === 0 && (
         <p className="text-on-surface-variant font-body-md">
-          No vehicles found. Run <code className="font-mono">npm run seed</code> in the backend.
+          {t('home.noVehicles')} <code className="font-mono">npm run seed</code> {t('home.noVehiclesSuffix')}
         </p>
       )}
 

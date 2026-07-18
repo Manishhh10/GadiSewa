@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { registerUser } from '@/store/actions/authActions';
 import { clearError } from '@/store/slices/authSlice';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 import type { RegisterPayload } from '@/types/auth';
 
 const inputCls =
@@ -13,6 +14,7 @@ const inputCls =
 export default function RegisterForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { t } = useTranslation();
   const { loading, error } = useAppSelector((s) => s.auth);
 
   const [form, setForm] = useState<RegisterPayload>({
@@ -54,17 +56,17 @@ export default function RegisterForm() {
       )}
 
       <div>
-        <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="fullName">Full Name</label>
+        <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="fullName">{t('auth.fullName')}</label>
         <input id="fullName" name="fullName" type="text" placeholder="John Doe" required value={form.fullName} onChange={onChange} className={inputCls} />
       </div>
 
       <div>
-        <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="email">Email Address</label>
+        <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="email">{t('auth.emailLabel')}</label>
         <input id="email" name="email" type="email" placeholder="name@example.com" required value={form.email} onChange={onChange} className={inputCls} />
       </div>
 
       <div>
-        <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="phone">Phone Number</label>
+        <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="phone">{t('auth.phoneNumber')}</label>
         <div className="flex gap-2">
           <span className="inline-flex items-center px-4 rounded-lg border border-slate-200 bg-surface-variant text-on-surface font-label-md">+977</span>
           <input id="phone" name="phone" type="tel" placeholder="98XXXXXXXX" value={form.phone} onChange={onChange} className={`flex-1 ${inputCls}`} />
@@ -73,11 +75,11 @@ export default function RegisterForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="password">Password</label>
+          <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="password">{t('auth.passwordLabel')}</label>
           <input id="password" name="password" type="password" placeholder="••••••••" required value={form.password} onChange={onChange} className={inputCls} />
         </div>
         <div>
-          <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="confirmPassword">Confirm Password</label>
+          <label className="block font-label-md text-label-md text-on-surface mb-2" htmlFor="confirmPassword">{t('auth.confirmPassword')}</label>
           <input id="confirmPassword" name="confirmPassword" type="password" placeholder="••••••••" required value={form.confirmPassword} onChange={onChange} className={inputCls} />
         </div>
       </div>
@@ -85,8 +87,8 @@ export default function RegisterForm() {
       <div className="flex items-start gap-3 py-2">
         <input id="terms" type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary/20" />
         <label htmlFor="terms" className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-          I agree to the <a className="text-primary font-semibold hover:underline" href="#">Terms of Service</a> and{' '}
-          <a className="text-primary font-semibold hover:underline" href="#">Privacy Policy</a>.
+          {t('auth.agreePrefix')} <a className="text-primary font-semibold hover:underline" href="#">{t('auth.termsOfService')}</a> {t('auth.and')}{' '}
+          <a className="text-primary font-semibold hover:underline" href="#">{t('auth.privacyPolicy')}</a>.
         </label>
       </div>
 
@@ -98,7 +100,7 @@ export default function RegisterForm() {
         {loading ? (
           <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
         ) : (
-          'Create My Account'
+          t('auth.createAccount')
         )}
       </button>
     </form>

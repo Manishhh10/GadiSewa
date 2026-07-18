@@ -1,27 +1,21 @@
-const steps = [
-  {
-    icon: 'search',
-    title: '1. Search',
-    desc: 'Enter your location, date, and browse through thousands of verified vehicles in our fleet.',
-  },
-  {
-    icon: 'book_online',
-    title: '2. Book',
-    desc: 'Choose your vehicle, select insurance options, and confirm with a small token payment.',
-  },
-  {
-    icon: 'local_taxi',
-    title: '3. Ride',
-    desc: 'Pick up your vehicle or have it delivered to your doorstep. Start your journey with confidence.',
-  },
-];
+'use client';
+
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 export default function HowItWorks() {
+  const { t } = useTranslation();
+
+  const steps = [
+    { icon: 'search', title: t('home.step1Title'), desc: t('home.step1Desc') },
+    { icon: 'book_online', title: t('home.step2Title'), desc: t('home.step2Desc') },
+    { icon: 'local_taxi', title: t('home.step3Title'), desc: t('home.step3Desc') },
+  ];
+
   return (
     <section className="py-20 bg-surface-container-low">
       <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
         <h2 className="font-headline-lg text-headline-lg text-center mb-12">
-          How GadiSewa Works
+          {t('home.howItWorksTitle')}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((s) => (

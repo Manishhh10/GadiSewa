@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 
 export default function Navbar() {
   const { user } = useAppSelector((s) => s.auth);
   const dispatch = useAppDispatch();
+  const { t, locale, toggleLocale } = useTranslation();
 
   return (
     <header className="bg-surface shadow-sm sticky top-0 z-50">
@@ -23,30 +25,34 @@ export default function Navbar() {
             href="/dashboard"
             className="text-on-surface-variant font-medium hover:text-primary transition-colors font-label-md text-label-md"
           >
-            Renters
+            {t('nav.renters')}
           </Link>
           <Link
             href={user?.role === 'vendor' || user?.role === 'admin' ? '/vendor' : '/vendor/apply'}
             className="text-on-surface-variant font-medium hover:text-primary transition-colors font-label-md text-label-md"
           >
-            Vendors
+            {t('nav.vendors')}
           </Link>
           {user?.role === 'admin' && (
             <Link
               href="/admin"
               className="text-on-surface-variant font-medium hover:text-primary transition-colors font-label-md text-label-md"
             >
-              Admin
+              {t('nav.admin')}
             </Link>
           )}
         </div>
 
         <div className="flex items-center gap-stack-md">
           <button
-            aria-label="Change language"
-            className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors"
+            type="button"
+            onClick={toggleLocale}
+            aria-label={t('nav.changeLanguage')}
+            title={t('nav.changeLanguage')}
+            className="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md"
           >
-            language
+            <span className="material-symbols-outlined">language</span>
+            <span className="uppercase">{locale === 'en' ? 'ने' : 'EN'}</span>
           </button>
 
           {user ? (
@@ -56,7 +62,7 @@ export default function Navbar() {
                 className="hidden sm:flex items-center gap-1 font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors"
               >
                 <span className="material-symbols-outlined text-[20px]">confirmation_number</span>
-                My Bookings
+                {t('nav.myBookings')}
               </Link>
               <span className="hidden sm:flex items-center gap-1 font-label-md text-label-md text-on-surface">
                 <span className="material-symbols-outlined">account_circle</span>
@@ -66,7 +72,7 @@ export default function Navbar() {
                 onClick={() => dispatch(logout())}
                 className="bg-surface-container text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container-high transition-colors"
               >
-                Logout
+                {t('nav.logout')}
               </button>
             </div>
           ) : (
@@ -74,7 +80,7 @@ export default function Navbar() {
               href="/login"
               className="bg-primary-container text-white px-6 py-2 rounded-lg font-label-md text-label-md active:scale-95 transition-transform"
             >
-              Login/Sign Up
+              {t('nav.login')}
             </Link>
           )}
         </div>

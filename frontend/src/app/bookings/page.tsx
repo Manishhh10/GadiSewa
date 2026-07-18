@@ -7,17 +7,10 @@ import Footer from '@/components/layout/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchMyBookings } from '@/store/actions/bookingActions';
 import { fmtDate, rs } from '@/lib/format';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 import type { Booking, BookingStatus } from '@/types/booking';
 
 const FILLED = { fontVariationSettings: "'FILL' 1" } as const;
-
-const TABS: { key: 'all' | BookingStatus; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'pending', label: 'Pending' },
-  { key: 'confirmed', label: 'Confirmed' },
-  { key: 'completed', label: 'Completed' },
-  { key: 'cancelled', label: 'Cancelled' },
-];
 
 const statusStyle: Record<BookingStatus, string> = {
   pending: 'bg-primary-container/15 text-primary',
@@ -29,6 +22,7 @@ const statusStyle: Record<BookingStatus, string> = {
 
 export default function MyBookingsPage() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { items, loading, error } = useAppSelector((s) => s.bookings);
   const user = useAppSelector((s) => s.auth.user);
   const [tab, setTab] = useState<'all' | BookingStatus>('all');
@@ -37,6 +31,14 @@ export default function MyBookingsPage() {
     dispatch(fetchMyBookings());
   }, [dispatch]);
 
+  const TABS: { key: 'all' | BookingStatus; label: string }[] = [
+    { key: 'all', label: t('bookings.all') },
+    { key: 'pending', label: t('bookings.pending') },
+    { key: 'confirmed', label: t('bookings.confirmed') },
+    { key: 'completed', label: t('bookings.completed') },
+    { key: 'cancelled', label: t('bookings.cancelled') },
+  ];
+
   const filtered = tab === 'all' ? items : items.filter((b) => b.status === tab);
 
   return (
@@ -44,9 +46,9 @@ export default function MyBookingsPage() {
       <Navbar />
       <main className="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-stack-lg">
         <div className="mb-stack-lg">
-          <h1 className="font-headline-xl text-headline-xl text-on-surface mb-2">My Bookings</h1>
+          <h1 className="font-headline-xl text-headline-xl text-on-surface mb-2">{t('bookings.title')}</h1>
           <p className="font-body-md text-on-surface-variant">
-            Manage your current, upcoming, and past vehicle rentals in one place.
+            {t('bookings.subtitle')}
           </p>
         </div>
 
@@ -67,7 +69,7 @@ export default function MyBookingsPage() {
           ))}
         </div>
 
-        {loading && <p className="font-body-md text-on-surface-variant">Loading your bookings…</p>}
+        {loading && <p className="font-body-md text-on-surface-variant">{t('bookings.loadingBookings')}</p>}
 
         {error && !loading && (
           <div className="bg-error-container text-on-error-container px-4 py-3 rounded-lg font-body-md">
@@ -83,15 +85,15 @@ export default function MyBookingsPage() {
             <div className="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-primary text-3xl">add</span>
             </div>
-            <p className="font-headline-md text-headline-md text-on-surface">No bookings here yet</p>
+            <p className="font-headline-md text-headline-md text-on-surface">{t('bookings.noBookingsYet')}</p>
             <p className="font-body-sm text-body-sm text-on-surface-variant mt-2">
-              Find the best deals on cars, bikes, and trucks across Nepal.
+              {t('bookings.findBestDeals')}
             </p>
             <Link
               href="/"
               className="mt-4 bg-primary-container text-white px-6 py-3 rounded-lg font-label-md text-label-md hover:brightness-110 transition-all"
             >
-              Book a Ride
+              {t('bookings.bookARide')}
             </Link>
           </div>
         )}
@@ -110,6 +112,7 @@ export default function MyBookingsPage() {
 }
 
 function BookingCard({ booking: b }: { booking: Booking }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-surface-container-low rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden border border-transparent hover:border-primary/20 transition-all flex flex-col">
       <div className="relative h-48 w-full bg-surface-dim">
@@ -121,7 +124,7 @@ function BookingCard({ booking: b }: { booking: Booking }) {
           <span className="material-symbols-outlined text-[16px]" style={FILLED}>
             {b.status === 'cancelled' ? 'cancel' : 'check_circle'}
           </span>
-          {b.status}
+          {t(`bookings.${b.status}`)}
         </div>
       </div>
       <div className="p-stack-md flex-grow flex flex-col">
@@ -129,7 +132,7 @@ function BookingCard({ booking: b }: { booking: Booking }) {
           <h3 className="font-headline-md text-headline-md">{b.vehicle.name}</h3>
           <span className="font-headline-sm text-headline-sm text-primary">{rs(b.totalAmount)}</span>
         </div>
-        <p className="text-xs text-on-surface-variant mb-3">Ref: {b.bookingRef}</p>
+        <p className="text-xs text-on-surface-variant mb-3">{t('bookings.ref')} {b.bookingRef}</p>
         <div className="space-y-2 mb-4 text-on-surface-variant text-sm">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-[18px]">calendar_today</span>
@@ -145,7 +148,7 @@ function BookingCard({ booking: b }: { booking: Booking }) {
             href={`/booking/${b._id}`}
             className="block w-full text-center bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all"
           >
-            View Details
+            {t('bookings.viewDetails')}
           </Link>
         </div>
       </div>

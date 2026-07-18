@@ -9,6 +9,7 @@ import BookingPanel from '@/components/vehicle/BookingPanel';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchVehicleById } from '@/store/actions/vehicleActions';
 import { clearSelected } from '@/store/slices/vehicleSlice';
+import { useTranslation } from '@/lib/i18n/I18nContext';
 import type { Vehicle } from '@/types/vehicle';
 
 const FILLED = { fontVariationSettings: "'FILL' 1" } as const;
@@ -17,6 +18,7 @@ export default function VehicleDetailsPage() {
   const params = useParams();
   const id = String(params.id);
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const {
     selected: v,
     selectedLoading: loading,
@@ -41,7 +43,7 @@ export default function VehicleDetailsPage() {
             {error} — is the backend running on :5001?
             <div className="mt-2">
               <Link href="/" className="text-primary font-semibold hover:underline">
-                ← Back to home
+                ← {t('common.backToHome')}
               </Link>
             </div>
           </div>
@@ -53,7 +55,7 @@ export default function VehicleDetailsPage() {
             <div className="flex flex-wrap justify-between items-center mb-6 gap-3">
               <nav className="flex items-center gap-1 font-body-sm text-body-sm text-on-surface-variant">
                 <Link href="/" className="hover:text-primary">
-                  Vehicles
+                  {t('vehicleDetail.breadcrumbVehicles')}
                 </Link>
                 <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                 <span>{v.type}</span>
@@ -63,7 +65,7 @@ export default function VehicleDetailsPage() {
               {v.verified && (
                 <div className="bg-tertiary-container/15 text-tertiary px-3 py-1 rounded-full flex items-center gap-1 font-label-md text-label-md border border-tertiary/20">
                   <span className="material-symbols-outlined" style={FILLED}>verified</span>
-                  Verified Photos
+                  {t('vehicleDetail.verifiedPhotos')}
                 </div>
               )}
             </div>
@@ -81,14 +83,14 @@ export default function VehicleDetailsPage() {
                   <div className="flex items-center gap-1 text-primary font-label-md text-label-md">
                     <span className="material-symbols-outlined text-[18px]" style={FILLED}>star</span>
                     <span>
-                      {v.rating.toFixed(1)} ({v.reviewsCount} reviews)
+                      {v.rating.toFixed(1)} ({v.reviewsCount} {t('vehicleDetail.reviews')})
                     </span>
                   </div>
                   {v.conditionScore > 0 && (
                     <>
                       <div className="h-4 w-px bg-outline-variant" />
                       <span className="text-on-surface-variant font-body-sm text-body-sm">
-                        Condition Score:{' '}
+                        {t('vehicleDetail.conditionScore')}{' '}
                         <span className="text-primary font-bold">{v.conditionScore}/10</span>
                       </span>
                     </>
@@ -116,16 +118,16 @@ export default function VehicleDetailsPage() {
 
                 {/* Description */}
                 <div className="border-t border-outline-variant pt-8 mb-8">
-                  <h2 className="font-headline-sm text-headline-sm mb-3">Description</h2>
+                  <h2 className="font-headline-sm text-headline-sm mb-3">{t('vehicleDetail.description')}</h2>
                   <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                    {v.description || 'No description provided.'}
+                    {v.description || t('vehicleDetail.noDescription')}
                   </p>
                 </div>
 
                 {/* Pickup location */}
                 <div className="border-t border-outline-variant pt-8 mb-8">
                   <h2 className="font-headline-sm text-headline-sm mb-3">
-                    Where you will collect this vehicle
+                    {t('vehicleDetail.pickupLocationTitle')}
                   </h2>
                   <div className="rounded-xl overflow-hidden border border-outline-variant">
                     <div className="w-full h-56 bg-surface-container-high flex items-center justify-center">
@@ -141,7 +143,7 @@ export default function VehicleDetailsPage() {
                             {v.location || 'Kathmandu'}
                           </p>
                           <p className="font-body-sm text-body-sm text-on-surface-variant">
-                            Exact location shared after booking
+                            {t('vehicleDetail.exactLocationShared')}
                           </p>
                         </div>
                       </div>
@@ -151,7 +153,7 @@ export default function VehicleDetailsPage() {
                         rel="noreferrer"
                         className="font-label-md text-label-md flex items-center gap-1 text-primary hover:underline"
                       >
-                        Get Directions
+                        {t('vehicleDetail.getDirections')}
                         <span className="material-symbols-outlined text-[18px]">directions</span>
                       </a>
                     </div>
@@ -161,7 +163,7 @@ export default function VehicleDetailsPage() {
                 {/* Host */}
                 {v.host && (
                   <div className="border-t border-outline-variant pt-8">
-                    <h2 className="font-headline-sm text-headline-sm mb-3">Hosted by</h2>
+                    <h2 className="font-headline-sm text-headline-sm mb-3">{t('vehicleDetail.hostedBy')}</h2>
                     <div className="bg-surface-container-low p-6 rounded-xl flex flex-col md:flex-row items-center gap-6">
                       <div className="relative shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -183,12 +185,12 @@ export default function VehicleDetailsPage() {
                           <h3 className="font-headline-sm text-headline-sm">{v.host.name}</h3>
                           {v.host.verified && (
                             <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded font-bold uppercase">
-                              Verified Host
+                              {t('vehicleDetail.verifiedHost')}
                             </span>
                           )}
                         </div>
                         <p className="font-body-sm text-body-sm text-on-surface-variant mb-2">
-                          Member since {v.host.memberSince}
+                          {t('vehicleDetail.memberSince')} {v.host.memberSince}
                         </p>
                         <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-1">
                           <Stat icon="stars" text={`${v.rating.toFixed(1)} Rating`} />
@@ -197,7 +199,7 @@ export default function VehicleDetailsPage() {
                         </div>
                       </div>
                       <button className="font-label-md text-label-md border border-primary text-primary px-6 py-2 rounded-lg hover:bg-primary/5 transition-colors">
-                        Contact Host
+                        {t('vehicleDetail.contactHost')}
                       </button>
                     </div>
                   </div>
