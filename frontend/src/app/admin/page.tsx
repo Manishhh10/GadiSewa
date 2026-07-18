@@ -6,15 +6,11 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import StatCard from '@/components/dashboard/StatCard';
 import { statsApi } from '@/api/stats.api';
+import { adminApi } from '@/api/admin.api';
+import { vehicleApi } from '@/api/vehicle.api';
 import { rs } from '@/lib/format';
 import type { Overview } from '@/types/stats';
-
-// Sample moderation queue — wired to real data once roles/applications exist.
-const SAMPLE_QUEUE = [
-  { id: 1, name: 'Himalayan Travels', kind: 'Vendor Application', date: 'Today', icon: 'storefront' },
-  { id: 2, name: 'Everest Rides', kind: 'Vendor Application', date: 'Yesterday', icon: 'storefront' },
-  { id: 3, name: 'Tata Winger — new listing', kind: 'Vehicle Listing', date: '2 days ago', icon: 'directions_car' },
-];
+import type { AdminApplication, AdminVehicle } from '@/types/admin';
 
 const LINKS = [
   { icon: 'how_to_reg', label: 'Review Vendor Applications', href: '/admin/applications' },
@@ -23,12 +19,75 @@ const LINKS = [
   { icon: 'reviews', label: 'Monitor Reviews', href: '/admin/reviews' },
 ];
 
+type QueueItem =
+  | { kind: 'application'; id: string; name: string; date: string }
+  | { kind: 'vehicle'; id: string; name: string; date: string };
+
 export default function AdminDashboardPage() {
   const [o, setO] = useState<Overview | null>(null);
+  const [applications, setApplications] = useState<AdminApplication[]>([]);
+  const [vehicles, setVehicles] = useState<AdminVehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actingOn, setActingOn] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
     statsApi.overview().then(setO).catch(() => {});
-  }, []);
+    Promise.all([adminApi.getApplications('pending'), adminApi.getVehicles()])
+      .then(([apps, vehs]) => {
+        setApplications(apps);
+        setVehicles(vehs.filter((v) => !v.verified));
+      })
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(load, []);
+
+  const queue: QueueItem[] = [
+    ...applications.map((a) => ({
+      kind: 'application' as const,
+      id: a._id,
+      name: a.businessName,
+      date: new Date(a.createdAt).toLocaleDateString(),
+    })),
+    ...vehicles.map((v) => ({
+      kind: 'vehicle' as const,
+      id: v._id,
+      name: `${v.name} — new listing`,
+      date: '',
+    })),
+  ];
+
+  const approve = async (item: QueueItem) => {
+    setActingOn(item.id);
+    try {
+      if (item.kind === 'application') {
+        await adminApi.updateApplication(item.id, 'approved');
+        setApplications((prev) => prev.filter((a) => a._id !== item.id));
+      } else {
+        await adminApi.verifyVehicle(item.id, true);
+        setVehicles((prev) => prev.filter((v) => v._id !== item.id));
+      }
+    } finally {
+      setActingOn(null);
+    }
+  };
+
+  const reject = async (item: QueueItem) => {
+    setActingOn(item.id);
+    try {
+      if (item.kind === 'application') {
+        await adminApi.updateApplication(item.id, 'rejected');
+        setApplications((prev) => prev.filter((a) => a._id !== item.id));
+      } else {
+        if (!window.confirm(`Remove the listing "${item.name}"?`)) return;
+        await vehicleApi.remove(item.id);
+        setVehicles((prev) => prev.filter((v) => v._id !== item.id));
+      }
+    } finally {
+      setActingOn(null);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -53,26 +112,47 @@ export default function AdminDashboardPage() {
           <section className="lg:col-span-2 space-y-stack-md">
             <div className="flex items-center justify-between">
               <h2 className="font-headline-md text-headline-md text-on-surface">Pending Approvals</h2>
-              <span className="font-body-sm text-body-sm text-outline">sample data</span>
             </div>
+
+            {loading && <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>}
+            {!loading && queue.length === 0 && (
+              <p className="font-body-sm text-body-sm text-on-surface-variant">Nothing pending review right now.</p>
+            )}
+
             <div className="space-y-stack-sm">
-              {SAMPLE_QUEUE.map((q) => (
+              {queue.map((q) => (
                 <div
-                  key={q.id}
+                  key={`${q.kind}-${q.id}`}
                   className="bg-surface-container-low p-stack-md rounded-xl border border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0px_4px_12px_rgba(0,0,0,0.05)]"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center">
-                      <span className="material-symbols-outlined text-primary">{q.icon}</span>
+                      <span className="material-symbols-outlined text-primary">
+                        {q.kind === 'application' ? 'storefront' : 'directions_car'}
+                      </span>
                     </div>
                     <div>
                       <div className="font-label-md text-label-md text-on-surface">{q.name}</div>
-                      <div className="font-body-sm text-body-sm text-on-surface-variant">{q.kind} • {q.date}</div>
+                      <div className="font-body-sm text-body-sm text-on-surface-variant">
+                        {q.kind === 'application' ? 'Vendor Application' : 'Vehicle Listing'} {q.date && `• ${q.date}`}
+                      </div>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors">Approve</button>
-                    <button className="border border-error text-error px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-error/5 transition-colors">Reject</button>
+                    <button
+                      disabled={actingOn === q.id}
+                      onClick={() => approve(q)}
+                      className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      disabled={actingOn === q.id}
+                      onClick={() => reject(q)}
+                      className="border border-error text-error px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-error/5 transition-colors disabled:opacity-50"
+                    >
+                      Reject
+                    </button>
                   </div>
                 </div>
               ))}

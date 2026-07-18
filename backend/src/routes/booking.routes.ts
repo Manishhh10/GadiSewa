@@ -6,6 +6,7 @@ import {
   getMyBookings,
   getVendorBookings,
   updateBookingStatus,
+  updateChecklist,
 } from '../controllers/booking.controller';
 import { initiateEsewaPayment } from '../controllers/payment.controller';
 import { protect, requireRole } from '../middlewares/auth.middleware';
@@ -22,5 +23,6 @@ router.get('/:id', getBookingById); //     GET    /api/bookings/:id
 router.post('/:id/esewa/initiate', initiateEsewaPayment); // POST /api/bookings/:id/esewa/initiate
 router.patch('/:id/status', requireRole('vendor', 'admin'), updateBookingStatus); // PATCH /api/bookings/:id/status
 router.patch('/:id/cancel', cancelBooking); // PATCH /api/bookings/:id/cancel
+router.patch('/:id/checklist', updateChecklist); // PATCH /api/bookings/:id/checklist
 
 export default router;

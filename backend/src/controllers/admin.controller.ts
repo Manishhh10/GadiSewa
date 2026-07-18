@@ -3,6 +3,8 @@ import { VendorApplication } from '../models/VendorApplication';
 import { Vehicle } from '../models/Vehicle';
 import { User } from '../models/User';
 import { AppError } from '../utils/AppError';
+import { sendMail } from '../utils/mailer';
+import { vendorApprovedEmail } from '../utils/emailTemplates';
 
 /** GET /api/admin/applications?status=pending */
 export async function getApplications(req: Request, res: Response, next: NextFunction) {
@@ -32,7 +34,12 @@ export async function updateApplication(req: Request, res: Response, next: NextF
     await application.save();
 
     if (status === 'approved') {
-      await User.findByIdAndUpdate(application.user, { role: 'vendor' });
+      const user = await User.findByIdAndUpdate(application.user, { role: 'vendor' });
+      if (user) {
+        sendMail(user.email, "You're a Verified Vendor! — GadiSewa", vendorApprovedEmail()).catch(
+          (err) => console.error('Failed to send vendor-approved email:', err)
+        );
+      }
     }
 
     res.json({ success: true, message: `Application ${status}`, data: { application } });

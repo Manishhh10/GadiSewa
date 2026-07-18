@@ -154,12 +154,12 @@ export default function ActiveTripPage() {
 
                 <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant space-y-3">
                   <h3 className="font-headline-sm text-headline-sm mb-1">Trip Actions</h3>
-                  <Link href="/damage-checklist" className="w-full flex items-center gap-3 p-3 rounded-xl border border-outline-variant hover:border-primary hover:bg-primary/5 transition-all">
+                  <Link href={`/damage-checklist?bookingId=${trip._id}`} className="w-full flex items-center gap-3 p-3 rounded-xl border border-outline-variant hover:border-primary hover:bg-primary/5 transition-all">
                     <span className="material-symbols-outlined text-primary">fact_check</span>
                     <span className="font-label-md text-label-md">Damage Checklist</span>
                     <span className="material-symbols-outlined text-outline ml-auto">chevron_right</span>
                   </Link>
-                  <Link href="/report-issue" className="w-full flex items-center gap-3 p-3 rounded-xl border border-outline-variant hover:border-error hover:bg-error/5 transition-all">
+                  <Link href={`/report-issue?bookingRef=${trip.bookingRef}`} className="w-full flex items-center gap-3 p-3 rounded-xl border border-outline-variant hover:border-error hover:bg-error/5 transition-all">
                     <span className="material-symbols-outlined text-error">report</span>
                     <span className="font-label-md text-label-md">Report an Issue</span>
                     <span className="material-symbols-outlined text-outline ml-auto">chevron_right</span>

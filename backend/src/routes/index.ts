@@ -7,6 +7,7 @@ import vendorRoutes from './vendor.routes';
 import adminRoutes from './admin.routes';
 import reviewRoutes from './review.routes';
 import paymentRoutes from './payment.routes';
+import issueRoutes from './issue.routes';
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use('/vendor', vendorRoutes);
 router.use('/admin', adminRoutes);
 router.use('/reviews', reviewRoutes);
 router.use('/payments', paymentRoutes);
+router.use('/issues', issueRoutes);
 
 export default router;

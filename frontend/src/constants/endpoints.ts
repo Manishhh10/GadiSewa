@@ -43,9 +43,16 @@ export const ENDPOINTS = {
     VERIFY_VEHICLE: (id: string) => `/api/admin/vehicles/${id}/verify`,
     REVIEWS: '/api/admin/reviews',
     REVIEW: (id: string) => `/api/admin/reviews/${id}`,
+    ISSUES: '/api/admin/issues',
+    DISPUTES: '/api/admin/disputes',
+    DISPUTE: (id: string) => `/api/admin/disputes/${id}`,
   },
   REVIEWS: {
     CREATE: '/api/reviews',
     FOR_VEHICLE: (vehicleId: string) => `/api/vehicles/${vehicleId}/reviews`,
   },
+  ISSUES: {
+    CREATE: '/api/issues',
+  },
+  CHECKLIST: (bookingId: string) => `/api/bookings/${bookingId}/checklist`,
 } as const;

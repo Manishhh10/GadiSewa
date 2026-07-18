@@ -7,6 +7,12 @@ export type BookingStatus =
   | 'completed'
   | 'cancelled';
 export type PaymentStatus = 'unpaid' | 'paid';
+export type ChecklistCondition = 'none' | 'minor' | 'major';
+
+export interface IChecklistItem {
+  key: string;
+  condition: ChecklistCondition;
+}
 
 export interface IBooking extends Document {
   user: Types.ObjectId;
@@ -25,9 +31,19 @@ export interface IBooking extends Document {
   bookingRef: string;
   transactionId?: string;
   esewaTransactionUuid?: string;
+  damageChecklist: IChecklistItem[];
+  checklistCompletedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const checklistItemSchema = new Schema<IChecklistItem>(
+  {
+    key: { type: String, required: true },
+    condition: { type: String, enum: ['none', 'minor', 'major'], required: true },
+  },
+  { _id: false }
+);
 
 const bookingSchema = new Schema<IBooking>(
   {
@@ -51,6 +67,8 @@ const bookingSchema = new Schema<IBooking>(
     bookingRef: { type: String, required: true, unique: true },
     transactionId: { type: String },
     esewaTransactionUuid: { type: String },
+    damageChecklist: { type: [checklistItemSchema], default: [] },
+    checklistCompletedAt: { type: Date },
   },
   { timestamps: true }
 );

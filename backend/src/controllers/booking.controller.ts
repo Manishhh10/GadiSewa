@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { Booking, BookingStatus } from '../models/Booking';
+import { Booking, BookingStatus, IChecklistItem } from '../models/Booking';
 import { Vehicle } from '../models/Vehicle';
 import { AppError } from '../utils/AppError';
 
@@ -164,6 +164,43 @@ export async function cancelBooking(req: Request, res: Response, next: NextFunct
     await booking.save();
     await booking.populate('vehicle');
     res.json({ success: true, message: 'Booking cancelled', data: { booking } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * PATCH /api/bookings/:id/checklist  (protected — the renter or the vehicle's owner)
+ * Body: { items: [{ key, condition }] }
+ */
+export async function updateChecklist(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { items } = req.body as { items?: { key: string; condition: string }[] };
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new AppError('items is required', 400);
+    }
+    const validConditions = ['none', 'minor', 'major'];
+    if (items.some((i) => !i.key || !validConditions.includes(i.condition))) {
+      throw new AppError('Each item needs a key and a valid condition', 400);
+    }
+
+    const booking = await Booking.findById(req.params.id).populate('vehicle');
+    if (!booking) throw new AppError('Booking not found', 404);
+
+    const vehicle = booking.vehicle as unknown as { owner?: { _id?: unknown } | string };
+    const ownerId =
+      vehicle?.owner && typeof vehicle.owner === 'object' ? vehicle.owner._id : vehicle?.owner;
+    const isRenter = booking.user.toString() === req.userId;
+    const isOwner = ownerId && String(ownerId) === req.userId;
+    if (!isRenter && !isOwner) {
+      throw new AppError('You do not have permission to update this checklist', 403);
+    }
+
+    booking.damageChecklist = items as IChecklistItem[];
+    booking.checklistCompletedAt = new Date();
+    await booking.save();
+
+    res.json({ success: true, message: 'Checklist saved', data: { booking } });
   } catch (err) {
     next(err);
   }

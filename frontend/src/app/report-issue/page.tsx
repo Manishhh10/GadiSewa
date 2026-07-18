@@ -1,24 +1,51 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { Suspense, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import { issueApi } from '@/api/support.api';
+import type { NormalizedError } from '@/lib/axios';
 
 const CATEGORIES = ['Vehicle damage', 'Late return', 'Payment problem', 'Vendor behaviour', 'Safety / Emergency', 'Other'];
 
 export default function ReportIssuePage() {
-  const [form, setForm] = useState({ category: CATEGORIES[0], bookingRef: '', description: '' });
+  return (
+    <Suspense fallback={null}>
+      <ReportIssueContent />
+    </Suspense>
+  );
+}
+
+function ReportIssueContent() {
+  const searchParams = useSearchParams();
+  const [form, setForm] = useState({
+    category: CATEGORIES[0],
+    bookingRef: searchParams.get('bookingRef') || '',
+    description: '',
+  });
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const inputCls =
     'w-full px-4 py-3 rounded-lg border border-outline-variant/40 bg-surface-container-low font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all';
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setSent(true); // demo — no support backend
+    setLoading(true);
+    setError(null);
+    try {
+      await issueApi.create(form);
+      setSent(true);
+    } catch (err) {
+      setError((err as NormalizedError).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,7 +60,7 @@ export default function ReportIssuePage() {
               </div>
               <h1 className="font-headline-md text-headline-md mb-2">Issue reported</h1>
               <p className="font-body-md text-on-surface-variant mb-6">
-                Our 24/7 support team will reach out shortly. Thanks for keeping GadiSewa safe.
+                Our support team will reach out shortly. Thanks for keeping GadiSewa safe.
               </p>
               <Link href="/" className="text-primary font-semibold hover:underline">← Back Home</Link>
             </div>
@@ -44,6 +71,11 @@ export default function ReportIssuePage() {
                 <p className="font-body-md text-on-surface-variant">Tell us what went wrong and we&apos;ll help resolve it.</p>
               </div>
               <form onSubmit={onSubmit} className="space-y-stack-md">
+                {error && (
+                  <div className="bg-error-container text-on-error-container px-4 py-3 rounded-lg font-body-sm text-body-sm">
+                    {error}
+                  </div>
+                )}
                 <div className="space-y-unit">
                   <label htmlFor="category" className="block font-label-md text-label-md text-on-surface mb-2">Issue Type</label>
                   <select id="category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={inputCls}>
@@ -57,9 +89,9 @@ export default function ReportIssuePage() {
                 </div>
                 <div className="border-2 border-dashed border-outline-variant rounded-xl p-6 flex flex-col items-center text-center text-on-surface-variant">
                   <span className="material-symbols-outlined text-3xl mb-1">add_a_photo</span>
-                  <span className="font-body-sm text-body-sm">Attach photos (optional)</span>
+                  <span className="font-body-sm text-body-sm">Attach photos (optional — not yet supported)</span>
                 </div>
-                <Button type="submit">Submit Report</Button>
+                <Button type="submit" loading={loading}>Submit Report</Button>
               </form>
             </div>
           )}

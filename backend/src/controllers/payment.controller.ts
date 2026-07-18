@@ -3,6 +3,8 @@ import { Booking } from '../models/Booking';
 import { AppError } from '../utils/AppError';
 import { env } from '../config/env';
 import { buildEsewaPaymentForm, decodeEsewaCallback, verifyEsewaCallback } from '../utils/esewa';
+import { sendMail } from '../utils/mailer';
+import { bookingConfirmationEmail } from '../utils/emailTemplates';
 
 /** POST /api/bookings/:id/esewa/initiate  (protected) — start a real eSewa UAT payment */
 export async function initiateEsewaPayment(req: Request, res: Response, next: NextFunction) {
@@ -50,7 +52,9 @@ export async function handleEsewaSuccess(req: Request, res: Response) {
       throw new Error(`Unexpected status: ${payload.status}`);
     }
 
-    const booking = await Booking.findOne({ esewaTransactionUuid: payload.transaction_uuid });
+    const booking = await Booking.findOne({ esewaTransactionUuid: payload.transaction_uuid })
+      .populate('vehicle')
+      .populate('user', 'email fullName username');
     if (!booking) throw new Error('No matching booking for this transaction');
 
     // Defense in depth: the paid amount must match what we asked for.
@@ -64,6 +68,20 @@ export async function handleEsewaSuccess(req: Request, res: Response) {
       booking.status = 'confirmed';
       booking.transactionId = payload.transaction_code;
       await booking.save();
+
+      const vehicle = booking.vehicle as unknown as { name: string };
+      const renter = booking.user as unknown as { email: string };
+      sendMail(
+        renter.email,
+        'Booking Confirmed — GadiSewa',
+        bookingConfirmationEmail({
+          vehicleName: vehicle.name,
+          bookingRef: booking.bookingRef,
+          pickupDate: booking.pickupDate.toDateString(),
+          returnDate: booking.returnDate.toDateString(),
+          totalAmount: booking.totalAmount,
+        })
+      ).catch((err) => console.error('Failed to send booking confirmation email:', err));
     }
 
     res.redirect(302, `${env.CLIENT_URL}/booking/${booking.id}/success`);

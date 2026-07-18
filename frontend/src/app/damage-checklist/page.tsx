@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Button from '@/components/ui/Button';
+import { checklistApi } from '@/api/support.api';
+import type { NormalizedError } from '@/lib/axios';
 
 const CATEGORIES = [
   { key: 'front_bumper', label: 'Front Bumper', icon: 'directions_car', hint: 'Scratches, dents, or misaligned grill.' },
@@ -22,9 +25,42 @@ const OPTIONS = [
 ];
 
 export default function DamageChecklistPage() {
+  return (
+    <Suspense fallback={null}>
+      <DamageChecklistContent />
+    </Suspense>
+  );
+}
+
+function DamageChecklistContent() {
+  const searchParams = useSearchParams();
+  const bookingId = searchParams.get('bookingId');
   const [state, setState] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const completed = Object.keys(state).length;
+
+  const onSubmit = async () => {
+    if (!bookingId) {
+      setError('No trip selected — open this page from your active trip.');
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      const items = Object.entries(state).map(([key, condition]) => ({
+        key,
+        condition: condition as 'none' | 'minor' | 'major',
+      }));
+      await checklistApi.update(bookingId, items);
+      setDone(true);
+    } catch (err) {
+      setError((err as NormalizedError).message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -42,6 +78,13 @@ export default function DamageChecklistPage() {
           </p>
         </div>
 
+        {!bookingId && !done && (
+          <div className="bg-error-container text-on-error-container px-4 py-3 rounded-lg font-body-md mb-stack-lg">
+            No trip selected. Open this checklist from your{' '}
+            <Link href="/active-trip" className="underline font-semibold">active trip</Link> so it can be saved.
+          </div>
+        )}
+
         {done ? (
           <div className="bg-surface-container-lowest rounded-xl p-10 border border-outline-variant text-center shadow-sm">
             <span className="material-symbols-outlined text-[48px] text-tertiary" style={{ fontVariationSettings: "'FILL' 1" }}>fact_check</span>
@@ -51,6 +94,9 @@ export default function DamageChecklistPage() {
           </div>
         ) : (
           <>
+            {error && (
+              <div className="bg-error-container text-on-error-container px-4 py-3 rounded-lg font-body-md mb-stack-lg">{error}</div>
+            )}
             <div className="space-y-stack-md">
               {CATEGORIES.map((c) => (
                 <section key={c.key} className="bg-surface-container-lowest p-stack-lg rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border border-outline-variant flex flex-col md:flex-row gap-stack-lg">
@@ -86,7 +132,13 @@ export default function DamageChecklistPage() {
             </div>
             <div className="flex items-center justify-between mt-stack-lg">
               <p className="font-body-sm text-body-sm text-on-surface-variant">{completed}/{CATEGORIES.length} sections checked</p>
-              <Button type="button" onClick={() => setDone(true)} className="md:w-auto md:px-12">
+              <Button
+                type="button"
+                onClick={onSubmit}
+                loading={saving}
+                disabled={completed !== CATEGORIES.length}
+                className="md:w-auto md:px-12"
+              >
                 Submit Checklist
               </Button>
             </div>

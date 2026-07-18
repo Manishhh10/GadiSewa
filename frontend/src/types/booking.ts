@@ -34,6 +34,8 @@ export interface Booking {
   paymentStatus: PaymentStatus;
   bookingRef: string;
   transactionId?: string;
+  damageChecklist?: { key: string; condition: 'none' | 'minor' | 'major' }[];
+  checklistCompletedAt?: string;
   createdAt: string;
 }
 
