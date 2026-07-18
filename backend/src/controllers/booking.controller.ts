@@ -112,28 +112,6 @@ export async function getBookingById(req: Request, res: Response, next: NextFunc
   }
 }
 
-/** POST /api/bookings/:id/pay  (protected) — simulate eSewa payment */
-export async function payBooking(req: Request, res: Response, next: NextFunction) {
-  try {
-    const booking = await Booking.findOne({ _id: req.params.id, user: req.userId });
-    if (!booking) throw new AppError('Booking not found', 404);
-
-    if (booking.paymentStatus === 'paid') {
-      throw new AppError('Booking is already paid', 400);
-    }
-
-    booking.paymentStatus = 'paid';
-    booking.status = 'confirmed';
-    booking.transactionId = String(Math.floor(1_000_000 + Math.random() * 9_000_000));
-    await booking.save();
-    await booking.populate('vehicle');
-
-    res.json({ success: true, message: 'Payment successful', data: { booking } });
-  } catch (err) {
-    next(err);
-  }
-}
-
 const VENDOR_TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
   pending: ['confirmed', 'cancelled'],
   confirmed: ['active', 'cancelled'],

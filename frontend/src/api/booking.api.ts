@@ -2,6 +2,7 @@ import http from '@/lib/axios';
 import { ENDPOINTS } from '@/constants/endpoints';
 import type { ApiResponse } from '@/types/auth';
 import type { Booking, CreateBookingPayload } from '@/types/booking';
+import type { EsewaPaymentInit } from '@/types/payment';
 
 // API LAYER for bookings (all endpoints require auth — token attached by axios).
 export const bookingApi = {
@@ -27,11 +28,11 @@ export const bookingApi = {
     return data.data.booking;
   },
 
-  pay: async (id: string): Promise<Booking> => {
-    const { data } = await http.post<ApiResponse<{ booking: Booking }>>(
-      ENDPOINTS.BOOKINGS.PAY(id)
+  initiateEsewa: async (id: string): Promise<EsewaPaymentInit> => {
+    const { data } = await http.post<ApiResponse<EsewaPaymentInit>>(
+      ENDPOINTS.BOOKINGS.ESEWA_INITIATE(id)
     );
-    return data.data.booking;
+    return data.data;
   },
 
   vendorList: async (): Promise<Booking[]> => {

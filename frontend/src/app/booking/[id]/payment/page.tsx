@@ -1,33 +1,58 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchBookingById, payBooking } from '@/store/actions/bookingActions';
+import { fetchBookingById, initiateEsewaPayment } from '@/store/actions/bookingActions';
 import { fmtDate, rs } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
 const FILLED = { fontVariationSettings: "'FILL' 1" } as const;
 
+/** Build a hidden form and submit it — a real browser POST to eSewa's gateway, not an API call. */
+function redirectToEsewa(url: string, fields: Record<string, string>) {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = url;
+  for (const [name, value] of Object.entries(fields)) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+  document.body.appendChild(form);
+  form.submit();
+}
+
 export default function PaymentPage() {
+  return (
+    <Suspense fallback={null}>
+      <PaymentPageContent />
+    </Suspense>
+  );
+}
+
+function PaymentPageContent() {
   const params = useParams();
   const id = String(params.id);
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const { current: b, loading, saving, error } = useAppSelector((s) => s.bookings);
+  const failed = searchParams.get('failed') === '1';
 
   useEffect(() => {
     dispatch(fetchBookingById(id));
   }, [dispatch, id]);
 
   const onPay = async () => {
-    const res = await dispatch(payBooking(id));
-    if (payBooking.fulfilled.match(res)) {
-      router.push(`/booking/${id}/success`);
+    const res = await dispatch(initiateEsewaPayment(id));
+    if (initiateEsewaPayment.fulfilled.match(res)) {
+      redirectToEsewa(res.payload.url, res.payload.fields);
     }
   };
 
@@ -46,6 +71,11 @@ export default function PaymentPage() {
         {loading && <p className="font-body-md text-on-surface-variant">Loading…</p>}
         {error && !loading && (
           <div className="bg-error-container text-on-error-container px-4 py-3 rounded-lg font-body-md">{error}</div>
+        )}
+        {failed && !loading && (
+          <div className="bg-error-container text-on-error-container px-4 py-3 rounded-lg font-body-md mb-6">
+            The eSewa payment was not completed. You can try again below.
+          </div>
         )}
 
         {b && !loading && (
@@ -100,7 +130,8 @@ export default function PaymentPage() {
                   )}
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     <span className="material-symbols-outlined text-[14px] align-middle">info</span>{' '}
-                    Demo gateway — clicking pay simulates a successful eSewa transaction.
+                    You&apos;ll be redirected to eSewa&apos;s test payment gateway — use test ID
+                    9711111111 / password Nepal@123 / MPIN 1122 to pay.
                   </p>
                 </div>
               </div>

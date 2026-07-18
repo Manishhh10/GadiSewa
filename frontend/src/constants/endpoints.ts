@@ -21,7 +21,7 @@ export const ENDPOINTS = {
     LIST: '/api/bookings',
     VENDOR: '/api/bookings/vendor',
     DETAIL: (id: string) => `/api/bookings/${id}`,
-    PAY: (id: string) => `/api/bookings/${id}/pay`,
+    ESEWA_INITIATE: (id: string) => `/api/bookings/${id}/esewa/initiate`,
     STATUS: (id: string) => `/api/bookings/${id}/status`,
     CANCEL: (id: string) => `/api/bookings/${id}/cancel`,
   },

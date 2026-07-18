@@ -5,7 +5,7 @@ import {
   fetchBookingById,
   fetchMyBookings,
   fetchVendorBookings,
-  payBooking,
+  initiateEsewaPayment,
   updateBookingStatus,
 } from '../actions/bookingActions';
 import type { Booking } from '@/types/booking';
@@ -56,18 +56,17 @@ const bookingSlice = createSlice({
         state.saving = false;
         state.error = action.payload ?? 'Could not create booking';
       })
-      // pay
-      .addCase(payBooking.pending, (state) => {
+      // initiate eSewa payment (redirects away from the app on success — no `current` update needed)
+      .addCase(initiateEsewaPayment.pending, (state) => {
         state.saving = true;
         state.error = null;
       })
-      .addCase(payBooking.fulfilled, (state, action) => {
+      .addCase(initiateEsewaPayment.fulfilled, (state) => {
         state.saving = false;
-        state.current = action.payload;
       })
-      .addCase(payBooking.rejected, (state, action) => {
+      .addCase(initiateEsewaPayment.rejected, (state, action) => {
         state.saving = false;
-        state.error = action.payload ?? 'Payment failed';
+        state.error = action.payload ?? 'Could not start payment';
       })
       // detail
       .addCase(fetchBookingById.pending, (state) => {

@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { bookingApi } from '@/api/booking.api';
 import { type NormalizedError } from '@/lib/axios';
 import type { Booking, CreateBookingPayload } from '@/types/booking';
+import type { EsewaPaymentInit } from '@/types/payment';
 
 export const createBooking = createAsyncThunk<
   Booking,
@@ -39,16 +40,17 @@ export const fetchBookingById = createAsyncThunk<
   }
 });
 
-export const payBooking = createAsyncThunk<Booking, string, { rejectValue: string }>(
-  'bookings/pay',
-  async (id, { rejectWithValue }) => {
-    try {
-      return await bookingApi.pay(id);
-    } catch (err) {
-      return rejectWithValue((err as NormalizedError).message);
-    }
+export const initiateEsewaPayment = createAsyncThunk<
+  EsewaPaymentInit,
+  string,
+  { rejectValue: string }
+>('bookings/initiateEsewa', async (id, { rejectWithValue }) => {
+  try {
+    return await bookingApi.initiateEsewa(id);
+  } catch (err) {
+    return rejectWithValue((err as NormalizedError).message);
   }
-);
+});
 
 export const fetchVendorBookings = createAsyncThunk<
   Booking[],

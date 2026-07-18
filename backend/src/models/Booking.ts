@@ -24,6 +24,7 @@ export interface IBooking extends Document {
   paymentStatus: PaymentStatus;
   bookingRef: string;
   transactionId?: string;
+  esewaTransactionUuid?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -49,6 +50,7 @@ const bookingSchema = new Schema<IBooking>(
     paymentStatus: { type: String, enum: ['unpaid', 'paid'], default: 'unpaid' },
     bookingRef: { type: String, required: true, unique: true },
     transactionId: { type: String },
+    esewaTransactionUuid: { type: String },
   },
   { timestamps: true }
 );
