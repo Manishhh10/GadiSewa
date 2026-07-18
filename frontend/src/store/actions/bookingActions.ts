@@ -49,3 +49,38 @@ export const payBooking = createAsyncThunk<Booking, string, { rejectValue: strin
     }
   }
 );
+
+export const fetchVendorBookings = createAsyncThunk<
+  Booking[],
+  void,
+  { rejectValue: string }
+>('bookings/vendorList', async (_, { rejectWithValue }) => {
+  try {
+    return await bookingApi.vendorList();
+  } catch (err) {
+    return rejectWithValue((err as NormalizedError).message);
+  }
+});
+
+export const updateBookingStatus = createAsyncThunk<
+  Booking,
+  { id: string; status: string },
+  { rejectValue: string }
+>('bookings/updateStatus', async ({ id, status }, { rejectWithValue }) => {
+  try {
+    return await bookingApi.updateStatus(id, status);
+  } catch (err) {
+    return rejectWithValue((err as NormalizedError).message);
+  }
+});
+
+export const cancelBooking = createAsyncThunk<Booking, string, { rejectValue: string }>(
+  'bookings/cancel',
+  async (id, { rejectWithValue }) => {
+    try {
+      return await bookingApi.cancel(id);
+    } catch (err) {
+      return rejectWithValue((err as NormalizedError).message);
+    }
+  }
+);

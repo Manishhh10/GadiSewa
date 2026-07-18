@@ -30,7 +30,8 @@ export interface Vehicle {
   specs: VehicleSpec[];
   location?: string;
   host?: Host;
-  owner?: string;
+  /** A plain user id in most contexts; populated with contact info on a booking's vehicle. */
+  owner?: string | { _id: string; fullName?: string; phone?: string; email?: string };
 }
 
 export interface VehicleQuery {

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchMyBookings } from '@/store/actions/bookingActions';
+import { cancelBooking, fetchMyBookings } from '@/store/actions/bookingActions';
 import { fmtDate, rs } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 import type { Booking, BookingStatus } from '@/types/booking';
@@ -113,6 +113,17 @@ export default function MyBookingsPage() {
 
 function BookingCard({ booking: b }: { booking: Booking }) {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const [cancelling, setCancelling] = useState(false);
+  const canCancel = b.status === 'pending' || b.status === 'confirmed';
+
+  const onCancel = async () => {
+    if (!window.confirm(t('bookings.cancelConfirm'))) return;
+    setCancelling(true);
+    await dispatch(cancelBooking(b._id));
+    setCancelling(false);
+  };
+
   return (
     <div className="bg-surface-container-low rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden border border-transparent hover:border-primary/20 transition-all flex flex-col">
       <div className="relative h-48 w-full bg-surface-dim">
@@ -143,13 +154,22 @@ function BookingCard({ booking: b }: { booking: Booking }) {
             <span>{b.pickupLocation}</span>
           </div>
         </div>
-        <div className="mt-auto">
+        <div className="mt-auto space-y-2">
           <Link
             href={`/booking/${b._id}`}
             className="block w-full text-center bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all"
           >
             {t('bookings.viewDetails')}
           </Link>
+          {canCancel && (
+            <button
+              onClick={onCancel}
+              disabled={cancelling}
+              className="block w-full text-center border border-error text-error py-3 rounded-lg font-label-md text-label-md hover:bg-error/5 transition-all disabled:opacity-50"
+            >
+              {t('bookings.cancelBooking')}
+            </button>
+          )}
         </div>
       </div>
     </div>

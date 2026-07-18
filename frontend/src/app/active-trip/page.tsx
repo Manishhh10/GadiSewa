@@ -21,6 +21,8 @@ export default function ActiveTripPage() {
   const trip =
     items.find((b) => b.status === 'active' || b.status === 'confirmed') ?? null;
 
+  const owner = trip && typeof trip.vehicle.owner === 'object' ? trip.vehicle.owner : null;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -90,28 +92,62 @@ export default function ActiveTripPage() {
 
               {/* Right */}
               <div className="md:col-span-5 space-y-stack-lg">
-                {trip.vehicle.host && (
+                {(trip.vehicle.host || owner) && (
                   <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant">
                     <div className="flex items-center gap-4 mb-6">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-surface-variant">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={trip.vehicle.host.avatarUrl} alt={trip.vehicle.host.name} className="w-full h-full object-cover" />
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center">
+                        {trip.vehicle.host?.avatarUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={trip.vehicle.host.avatarUrl} alt={trip.vehicle.host.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="material-symbols-outlined text-on-surface-variant">person</span>
+                        )}
                       </div>
                       <div>
                         <div className="flex items-center gap-1">
-                          <h3 className="font-bold text-on-surface">{trip.vehicle.host.name}</h3>
-                          <span className="material-symbols-outlined text-primary text-sm" style={FILLED}>verified</span>
+                          <h3 className="font-bold text-on-surface">
+                            {trip.vehicle.host?.name || owner?.fullName || 'Vendor'}
+                          </h3>
+                          {trip.vehicle.host?.verified && (
+                            <span className="material-symbols-outlined text-primary text-sm" style={FILLED}>verified</span>
+                          )}
                         </div>
                         <p className="text-xs text-on-surface-variant">Verified Vendor</p>
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <button className="w-full flex items-center justify-center gap-2 bg-primary-container text-white py-3 rounded-xl font-label-md hover:brightness-110 transition-all">
-                        <span className="material-symbols-outlined text-[20px]">call</span> Call Vendor
-                      </button>
-                      <button className="w-full flex items-center justify-center gap-2 border border-outline text-on-surface py-3 rounded-xl font-label-md hover:bg-surface-container transition-colors">
-                        <span className="material-symbols-outlined text-[20px]">mail</span> Email Vendor
-                      </button>
+                      {owner?.phone ? (
+                        <a
+                          href={`tel:${owner.phone}`}
+                          className="w-full flex items-center justify-center gap-2 bg-primary-container text-white py-3 rounded-xl font-label-md hover:brightness-110 transition-all"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">call</span> Call Vendor
+                        </a>
+                      ) : (
+                        <button
+                          disabled
+                          title="No phone number on file for this vendor"
+                          className="w-full flex items-center justify-center gap-2 bg-surface-container text-on-surface-variant py-3 rounded-xl font-label-md cursor-not-allowed"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">call</span> Call Vendor
+                        </button>
+                      )}
+                      {owner?.email ? (
+                        <a
+                          href={`mailto:${owner.email}`}
+                          className="w-full flex items-center justify-center gap-2 border border-outline text-on-surface py-3 rounded-xl font-label-md hover:bg-surface-container transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">mail</span> Email Vendor
+                        </a>
+                      ) : (
+                        <button
+                          disabled
+                          title="No email on file for this vendor"
+                          className="w-full flex items-center justify-center gap-2 border border-outline-variant text-on-surface-variant py-3 rounded-xl font-label-md cursor-not-allowed"
+                        >
+                          <span className="material-symbols-outlined text-[20px]">mail</span> Email Vendor
+                        </button>
+                      )}
                     </div>
                   </section>
                 )}

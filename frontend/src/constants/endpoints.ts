@@ -19,8 +19,11 @@ export const ENDPOINTS = {
   BOOKINGS: {
     CREATE: '/api/bookings',
     LIST: '/api/bookings',
+    VENDOR: '/api/bookings/vendor',
     DETAIL: (id: string) => `/api/bookings/${id}`,
     PAY: (id: string) => `/api/bookings/${id}/pay`,
+    STATUS: (id: string) => `/api/bookings/${id}/status`,
+    CANCEL: (id: string) => `/api/bookings/${id}/cancel`,
   },
   VENDOR: {
     APPLY: '/api/vendor/applications',

@@ -33,4 +33,26 @@ export const bookingApi = {
     );
     return data.data.booking;
   },
+
+  vendorList: async (): Promise<Booking[]> => {
+    const { data } = await http.get<ApiResponse<{ bookings: Booking[] }>>(
+      ENDPOINTS.BOOKINGS.VENDOR
+    );
+    return data.data.bookings;
+  },
+
+  updateStatus: async (id: string, status: string): Promise<Booking> => {
+    const { data } = await http.patch<ApiResponse<{ booking: Booking }>>(
+      ENDPOINTS.BOOKINGS.STATUS(id),
+      { status }
+    );
+    return data.data.booking;
+  },
+
+  cancel: async (id: string): Promise<Booking> => {
+    const { data } = await http.patch<ApiResponse<{ booking: Booking }>>(
+      ENDPOINTS.BOOKINGS.CANCEL(id)
+    );
+    return data.data.booking;
+  },
 };

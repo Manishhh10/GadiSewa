@@ -152,6 +152,8 @@ const ne: Dictionary = {
     bookARide: 'सवारी बुक गर्नुहोस्',
     viewDetails: 'विवरण हेर्नुहोस्',
     ref: 'सन्दर्भ:',
+    cancelBooking: 'बुकिङ रद्द गर्नुहोस्',
+    cancelConfirm: 'यो बुकिङ रद्द गर्ने? यो फिर्ता गर्न सकिँदैन।',
   },
   bookingReview: {
     cancelGoBack: 'रद्द गरी पछाडि जानुहोस्',

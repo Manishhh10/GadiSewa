@@ -8,9 +8,18 @@ export type BookingStatus =
   | 'cancelled';
 export type PaymentStatus = 'unpaid' | 'paid';
 
+export interface BookingRenter {
+  _id: string;
+  fullName?: string;
+  username?: string;
+  email?: string;
+  phone?: string;
+}
+
 export interface Booking {
   _id: string;
-  user: string;
+  /** A plain user id on the renter's own bookings; populated with contact info on vendor bookings. */
+  user: string | BookingRenter;
   vehicle: Vehicle; // populated by the backend
   pickupDate: string;
   returnDate: string;

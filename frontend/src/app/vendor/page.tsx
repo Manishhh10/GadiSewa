@@ -8,23 +8,31 @@ import StatCard from '@/components/dashboard/StatCard';
 import RequireRole from '@/components/auth/RequireRole';
 import { statsApi } from '@/api/stats.api';
 import { rs } from '@/lib/format';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchVendorBookings, updateBookingStatus } from '@/store/actions/bookingActions';
+import { fmtDate } from '@/lib/format';
 import type { Overview } from '@/types/stats';
-
-// Sample requests — per-vendor data needs vendor roles (later batch).
-const SAMPLE_REQUESTS = [
-  { id: 1, name: 'Toyota Hiace', plate: 'BA 2 PA 4567', route: 'Kathmandu → Pokhara', date: '12 Oct', icon: 'airport_shuttle' },
-  { id: 2, name: 'Mahindra Scorpio', plate: 'BA 15 CHA 9901', route: 'Local Sightseeing', date: '14 Oct', icon: 'directions_car' },
-  { id: 3, name: 'Tata Ace', plate: 'BA 4 CHA 1122', route: 'Chabahil → Kalanki', date: '15 Oct', icon: 'local_shipping' },
-];
 
 const fmtK = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
 
 export default function VendorDashboardPage() {
   const [o, setO] = useState<Overview | null>(null);
+  const dispatch = useAppDispatch();
+  const { vendorItems, vendorLoading, vendorError } = useAppSelector((s) => s.bookings);
+  const [actingOn, setActingOn] = useState<string | null>(null);
 
   useEffect(() => {
     statsApi.overview().then(setO).catch(() => {});
-  }, []);
+    dispatch(fetchVendorBookings());
+  }, [dispatch]);
+
+  const pending = vendorItems.filter((b) => b.status === 'pending');
+
+  const act = async (id: string, status: 'confirmed' | 'cancelled') => {
+    setActingOn(id);
+    await dispatch(updateBookingStatus({ id, status }));
+    setActingOn(null);
+  };
 
   return (
     <RequireRole roles={['vendor', 'admin']}>
@@ -68,29 +76,57 @@ export default function VendorDashboardPage() {
           <section className="lg:col-span-2 space-y-stack-md">
             <div className="flex items-center justify-between">
               <h2 className="font-headline-md text-headline-md text-on-surface">Recent Booking Requests</h2>
-              <span className="font-body-sm text-body-sm text-outline">sample data</span>
             </div>
+
+            {vendorLoading && <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>}
+            {vendorError && !vendorLoading && (
+              <p className="font-body-sm text-body-sm text-error">{vendorError}</p>
+            )}
+            {!vendorLoading && !vendorError && pending.length === 0 && (
+              <p className="font-body-sm text-body-sm text-on-surface-variant">No pending booking requests right now.</p>
+            )}
+
             <div className="space-y-stack-sm">
-              {SAMPLE_REQUESTS.map((r) => (
-                <div
-                  key={r.id}
-                  className="bg-surface-container-low p-stack-md rounded-xl border border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0px_4px_12px_rgba(0,0,0,0.05)]"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center">
-                      <span className="material-symbols-outlined text-primary">{r.icon}</span>
+              {pending.map((b) => {
+                const renterName =
+                  typeof b.user === 'object' ? b.user.fullName || b.user.username : 'Renter';
+                return (
+                  <div
+                    key={b._id}
+                    className="bg-surface-container-low p-stack-md rounded-xl border border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0px_4px_12px_rgba(0,0,0,0.05)]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center">
+                        <span className="material-symbols-outlined text-primary">directions_car</span>
+                      </div>
+                      <div>
+                        <div className="font-label-md text-label-md text-on-surface">
+                          {b.vehicle.name} <span className="text-on-surface-variant">({renterName})</span>
+                        </div>
+                        <div className="font-body-sm text-body-sm text-on-surface-variant">
+                          {fmtDate(b.pickupDate)} – {fmtDate(b.returnDate)} • {rs(b.totalAmount)}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-label-md text-label-md text-on-surface">{r.name} <span className="text-on-surface-variant">({r.plate})</span></div>
-                      <div className="font-body-sm text-body-sm text-on-surface-variant">{r.route} • {r.date}</div>
+                    <div className="flex gap-2">
+                      <button
+                        disabled={actingOn === b._id}
+                        onClick={() => act(b._id, 'confirmed')}
+                        className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        disabled={actingOn === b._id}
+                        onClick={() => act(b._id, 'cancelled')}
+                        className="bg-error text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
+                      >
+                        Decline
+                      </button>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors">Accept</button>
-                    <button className="bg-error text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors">Decline</button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
 

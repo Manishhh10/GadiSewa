@@ -150,6 +150,8 @@ const en = {
     bookARide: 'Book a Ride',
     viewDetails: 'View Details',
     ref: 'Ref:',
+    cancelBooking: 'Cancel Booking',
+    cancelConfirm: 'Cancel this booking? This cannot be undone.',
   },
   bookingReview: {
     cancelGoBack: 'Cancel and go back',
