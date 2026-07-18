@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import { connectDB } from './config/db';
 import { Vehicle } from './models/Vehicle';
+import { User } from './models/User';
+
+const ADMIN_EMAIL = 'admin@gadisewa.com';
+const ADMIN_PASSWORD = 'Admin@12345';
 
 // Vehicle imagery reused from the Stitch design export.
 const IMG = {
@@ -143,6 +147,25 @@ async function seed() {
   await Vehicle.deleteMany({});
   await Vehicle.insertMany(vehicles);
   console.log(`🌱  Seeded ${vehicles.length} vehicles`);
+
+  let admin = await User.findOne({ email: ADMIN_EMAIL });
+  if (!admin) {
+    admin = await User.create({
+      fullName: 'GadiSewa Admin',
+      email: ADMIN_EMAIL,
+      username: 'admin',
+      password: ADMIN_PASSWORD,
+      role: 'admin',
+    });
+    console.log(`🔑  Created admin account — email: ${ADMIN_EMAIL}  password: ${ADMIN_PASSWORD}`);
+  } else if (admin.role !== 'admin') {
+    admin.role = 'admin';
+    await admin.save();
+    console.log(`🔑  Promoted existing account ${ADMIN_EMAIL} to admin`);
+  } else {
+    console.log(`🔑  Admin account already exists — email: ${ADMIN_EMAIL}`);
+  }
+
   await mongoose.disconnect();
   process.exit(0);
 }

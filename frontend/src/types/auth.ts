@@ -1,8 +1,11 @@
+export type UserRole = 'renter' | 'vendor' | 'admin';
+
 export interface User {
   id: string;
   email: string;
   username: string;
   fullName?: string;
+  role: UserRole;
 }
 
 export interface RegisterPayload {

@@ -36,7 +36,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
       password,
       username: finalUsername,
     });
-    const token = signToken({ id: user.id, email: user.email });
+    const token = signToken({ id: user.id, email: user.email, role: user.role });
 
     res.status(201).json({
       success: true,
@@ -48,6 +48,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
           email: user.email,
           username: user.username,
           fullName: user.fullName,
+          role: user.role,
         },
       },
     });
@@ -73,7 +74,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       throw new AppError('Invalid email or password', 401);
     }
 
-    const token = signToken({ id: user.id, email: user.email });
+    const token = signToken({ id: user.id, email: user.email, role: user.role });
 
     res.status(200).json({
       success: true,
@@ -85,6 +86,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
           email: user.email,
           username: user.username,
           fullName: user.fullName,
+          role: user.role,
         },
       },
     });
@@ -111,6 +113,7 @@ export async function me(req: Request, res: Response, next: NextFunction) {
           email: user.email,
           username: user.username,
           fullName: user.fullName,
+          role: user.role,
         },
       },
     });

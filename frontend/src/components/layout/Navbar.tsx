@@ -26,17 +26,19 @@ export default function Navbar() {
             Renters
           </Link>
           <Link
-            href="/vendor"
+            href={user?.role === 'vendor' || user?.role === 'admin' ? '/vendor' : '/vendor/apply'}
             className="text-on-surface-variant font-medium hover:text-primary transition-colors font-label-md text-label-md"
           >
             Vendors
           </Link>
-          <Link
-            href="/admin"
-            className="text-on-surface-variant font-medium hover:text-primary transition-colors font-label-md text-label-md"
-          >
-            Admin
-          </Link>
+          {user?.role === 'admin' && (
+            <Link
+              href="/admin"
+              className="text-on-surface-variant font-medium hover:text-primary transition-colors font-label-md text-label-md"
+            >
+              Admin
+            </Link>
+          )}
         </div>
 
         <div className="flex items-center gap-stack-md">

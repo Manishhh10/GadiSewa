@@ -8,6 +8,8 @@ interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+  /** True once the initial "am I logged in?" check has settled (fetchMe resolved, or there was no token to check). */
+  initialized: boolean;
 }
 
 const initialState: AuthState = {
@@ -15,6 +17,7 @@ const initialState: AuthState = {
   token: null,
   loading: false,
   error: null,
+  initialized: false,
 };
 
 const authSlice = createSlice({
@@ -29,6 +32,9 @@ const authSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    authInitialized: (state) => {
+      state.initialized = true;
     },
   },
   extraReducers: (builder) => {
@@ -58,12 +64,14 @@ const authSlice = createSlice({
       // rehydrate
       .addCase(fetchMe.fulfilled, (state, action: PayloadAction<User>) => {
         state.user = action.payload;
+        state.initialized = true;
       })
       .addCase(fetchMe.rejected, (state) => {
         state.user = null;
+        state.initialized = true;
       });
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, authInitialized } = authSlice.actions;
 export default authSlice.reducer;

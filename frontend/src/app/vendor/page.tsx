@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import StatCard from '@/components/dashboard/StatCard';
+import RequireRole from '@/components/auth/RequireRole';
 import { statsApi } from '@/api/stats.api';
 import { rs } from '@/lib/format';
 import type { Overview } from '@/types/stats';
@@ -26,6 +27,7 @@ export default function VendorDashboardPage() {
   }, []);
 
   return (
+    <RequireRole roles={['vendor', 'admin']}>
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-stack-lg space-y-stack-lg">
@@ -103,5 +105,6 @@ export default function VendorDashboardPage() {
       </main>
       <Footer />
     </div>
+    </RequireRole>
   );
 }

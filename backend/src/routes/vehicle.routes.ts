@@ -4,12 +4,12 @@ import {
   getVehicleById,
   getVehicles,
 } from '../controllers/vehicle.controller';
-import { protect } from '../middlewares/auth.middleware';
+import { protect, requireRole } from '../middlewares/auth.middleware';
 
 const router = Router();
 
 router.get('/', getVehicles); //               GET  /api/vehicles
-router.post('/', protect, createVehicle); //   POST /api/vehicles  (protected)
+router.post('/', protect, requireRole('vendor', 'admin'), createVehicle); // POST /api/vehicles (vendor/admin)
 router.get('/:id', getVehicleById); //         GET  /api/vehicles/:id
 
 export default router;

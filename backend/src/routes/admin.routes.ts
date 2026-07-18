@@ -5,13 +5,11 @@ import {
   updateApplication,
   verifyVehicle,
 } from '../controllers/admin.controller';
-import { protect } from '../middlewares/auth.middleware';
+import { protect, requireRole } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// NOTE: protected (logged-in). Role-gating to 'admin' can be added here once an
-// admin account exists — kept open for the demo so the panel is usable.
-router.use(protect);
+router.use(protect, requireRole('admin'));
 
 router.get('/applications', getApplications);
 router.patch('/applications/:id', updateApplication);

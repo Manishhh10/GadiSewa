@@ -6,6 +6,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import RequireRole from '@/components/auth/RequireRole';
 import { useAppSelector } from '@/store/hooks';
 import { vehicleApi } from '@/api/vehicle.api';
 import type { NormalizedError } from '@/lib/axios';
@@ -73,6 +74,7 @@ export default function AddVehiclePage() {
     'w-full px-4 py-3 rounded-lg border border-outline-variant/40 bg-surface-container-low font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary-container focus:border-primary-container transition-all';
 
   return (
+    <RequireRole roles={['vendor', 'admin']}>
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-stack-lg">
@@ -166,5 +168,6 @@ export default function AddVehiclePage() {
       </main>
       <Footer />
     </div>
+    </RequireRole>
   );
 }
