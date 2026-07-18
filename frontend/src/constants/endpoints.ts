@@ -11,7 +11,10 @@ export const ENDPOINTS = {
   VEHICLES: {
     LIST: '/api/vehicles',
     CREATE: '/api/vehicles',
+    MINE: '/api/vehicles/mine',
     DETAIL: (id: string) => `/api/vehicles/${id}`,
+    UPDATE: (id: string) => `/api/vehicles/${id}`,
+    DELETE: (id: string) => `/api/vehicles/${id}`,
   },
   BOOKINGS: {
     CREATE: '/api/bookings',

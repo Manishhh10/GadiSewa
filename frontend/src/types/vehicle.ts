@@ -30,12 +30,18 @@ export interface Vehicle {
   specs: VehicleSpec[];
   location?: string;
   host?: Host;
+  owner?: string;
 }
 
 export interface VehicleQuery {
   type?: string;
   featured?: boolean;
   q?: string;
+  location?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  pickupDate?: string;
+  returnDate?: string;
 }
 
 export interface CreateVehiclePayload {
@@ -49,3 +55,5 @@ export interface CreateVehiclePayload {
   transmission?: string;
   fuelType?: string;
 }
+
+export type UpdateVehiclePayload = Partial<CreateVehiclePayload>;

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { Suspense, useEffect, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import VehicleCard from '@/components/home/VehicleCard';
@@ -9,30 +10,68 @@ import { fetchVehicles } from '@/store/actions/vehicleActions';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
 const TYPES = ['All', 'Bike', 'Car', 'SUV', 'Van', 'Truck'];
+const MIN_PRICE = 500;
+const MAX_PRICE = 15000;
+
+const addDaysISO = (iso: string, days: number) => {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+};
 
 export default function RenterDashboardPage() {
+  return (
+    <Suspense fallback={null}>
+      <RenterDashboardContent />
+    </Suspense>
+  );
+}
+
+function RenterDashboardContent() {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
   const { items, loading, error } = useAppSelector((s) => s.vehicles);
   const [type, setType] = useState('All');
   const [q, setQ] = useState('');
+  const [location, setLocation] = useState('');
+  const [pickupDate, setPickupDate] = useState('');
+  const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
 
+  // Pick up filters forwarded from the homepage search bar, once, on mount.
   useEffect(() => {
+    const typeParam = searchParams.get('type');
+    const locationParam = searchParams.get('location');
+    const pickupParam = searchParams.get('pickupDate');
+    if (typeParam) setType(typeParam);
+    if (locationParam) setLocation(locationParam);
+    if (pickupParam) setPickupDate(pickupParam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const runSearch = () => {
     dispatch(
       fetchVehicles({
         type: type === 'All' ? undefined : type,
         q: q || undefined,
+        location: location || undefined,
+        maxPrice: maxPrice < MAX_PRICE ? maxPrice : undefined,
+        pickupDate: pickupDate || undefined,
+        returnDate: pickupDate ? addDaysISO(pickupDate, 1) : undefined,
       })
     );
-    // refetch when the type filter changes (search box refetches on submit)
+  };
+
+  useEffect(() => {
+    runSearch();
+    // refetch whenever a filter that isn't the free-text search box changes
+    // (the search box refetches on form submit instead, to avoid a request per keystroke)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, type]);
+  }, [dispatch, type, location, pickupDate, maxPrice]);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
-    dispatch(
-      fetchVehicles({ type: type === 'All' ? undefined : type, q: q || undefined })
-    );
+    runSearch();
   };
 
   return (
@@ -51,6 +90,15 @@ export default function RenterDashboardPage() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t('dashboard.searchPlaceholder')}
+                className="bg-transparent w-full outline-none font-body-md text-body-md"
+              />
+            </div>
+            <div className="flex-1 w-full flex items-center gap-2 px-4 py-2 bg-surface rounded-lg border border-outline-variant">
+              <span className="material-symbols-outlined text-outline">location_on</span>
+              <input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder={t('home.whereTo')}
                 className="bg-transparent w-full outline-none font-body-md text-body-md"
               />
             </div>
@@ -74,17 +122,17 @@ export default function RenterDashboardPage() {
                 {t('dashboard.vehicleTypeLabel')}
               </span>
               <div className="flex flex-wrap gap-2 mt-2">
-                {TYPES.map((t) => (
+                {TYPES.map((ty) => (
                   <button
-                    key={t}
-                    onClick={() => setType(t)}
+                    key={ty}
+                    onClick={() => setType(ty)}
                     className={`px-3 py-1 rounded-full font-label-md text-label-md border transition-all ${
-                      type === t
+                      type === ty
                         ? 'border-primary text-primary bg-primary/5'
                         : 'border-outline-variant text-on-surface-variant hover:border-primary'
                     }`}
                   >
-                    {t}
+                    {ty}
                   </button>
                 ))}
               </div>
@@ -93,10 +141,17 @@ export default function RenterDashboardPage() {
               <span className="font-label-md text-label-md text-outline uppercase tracking-wider">
                 {t('dashboard.priceRange')}
               </span>
-              <input type="range" min={500} max={15000} defaultValue={8000} className="w-full accent-primary mt-2" />
+              <input
+                type="range"
+                min={MIN_PRICE}
+                max={MAX_PRICE}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="w-full accent-primary mt-2"
+              />
               <div className="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
-                <span>500</span>
-                <span>15,000+</span>
+                <span>{MIN_PRICE}</span>
+                <span>{maxPrice >= MAX_PRICE ? `${MAX_PRICE.toLocaleString()}+` : maxPrice.toLocaleString()}</span>
               </div>
             </div>
           </div>

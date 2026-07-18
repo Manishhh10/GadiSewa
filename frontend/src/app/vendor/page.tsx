@@ -38,12 +38,20 @@ export default function VendorDashboardPage() {
               Welcome back. Here&apos;s what&apos;s happening with your fleet today.
             </p>
           </div>
-          <Link
-            href="/vendor/add-vehicle"
-            className="bg-primary-container text-white px-6 py-3 rounded-lg font-label-md text-label-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-2"
-          >
-            <span className="material-symbols-outlined text-[20px]">add</span> Add Vehicle
-          </Link>
+          <div className="flex gap-3">
+            <Link
+              href="/vendor/vehicles"
+              className="border border-outline-variant text-on-surface px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-all flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-[20px]">directions_car</span> My Vehicles
+            </Link>
+            <Link
+              href="/vendor/add-vehicle"
+              className="bg-primary-container text-white px-6 py-3 rounded-lg font-label-md text-label-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-[20px]">add</span> Add Vehicle
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}

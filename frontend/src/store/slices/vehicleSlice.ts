@@ -1,5 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchVehicleById, fetchVehicles } from '../actions/vehicleActions';
+import {
+  deleteVehicle,
+  fetchMyVehicles,
+  fetchVehicleById,
+  fetchVehicles,
+  updateVehicle,
+} from '../actions/vehicleActions';
 import type { Vehicle } from '@/types/vehicle';
 
 interface VehicleState {
@@ -10,6 +16,10 @@ interface VehicleState {
   selected: Vehicle | null;
   selectedLoading: boolean;
   selectedError: string | null;
+  // the current vendor's own listings
+  mine: Vehicle[];
+  mineLoading: boolean;
+  mineError: string | null;
 }
 
 const initialState: VehicleState = {
@@ -19,6 +29,9 @@ const initialState: VehicleState = {
   selected: null,
   selectedLoading: false,
   selectedError: null,
+  mine: [],
+  mineLoading: false,
+  mineError: null,
 };
 
 const vehicleSlice = createSlice({
@@ -58,6 +71,27 @@ const vehicleSlice = createSlice({
       .addCase(fetchVehicleById.rejected, (state, action) => {
         state.selectedLoading = false;
         state.selectedError = action.payload ?? 'Failed to load vehicle';
+      })
+      // mine
+      .addCase(fetchMyVehicles.pending, (state) => {
+        state.mineLoading = true;
+        state.mineError = null;
+      })
+      .addCase(fetchMyVehicles.fulfilled, (state, action) => {
+        state.mineLoading = false;
+        state.mine = action.payload;
+      })
+      .addCase(fetchMyVehicles.rejected, (state, action) => {
+        state.mineLoading = false;
+        state.mineError = action.payload ?? 'Failed to load your vehicles';
+      })
+      // update
+      .addCase(updateVehicle.fulfilled, (state, action) => {
+        state.mine = state.mine.map((v) => (v._id === action.payload._id ? action.payload : v));
+      })
+      // delete
+      .addCase(deleteVehicle.fulfilled, (state, action) => {
+        state.mine = state.mine.filter((v) => v._id !== action.payload);
       });
   },
 });

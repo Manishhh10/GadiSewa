@@ -1,7 +1,12 @@
 import http from '@/lib/axios';
 import { ENDPOINTS } from '@/constants/endpoints';
 import type { ApiResponse } from '@/types/auth';
-import type { CreateVehiclePayload, Vehicle, VehicleQuery } from '@/types/vehicle';
+import type {
+  CreateVehiclePayload,
+  UpdateVehiclePayload,
+  Vehicle,
+  VehicleQuery,
+} from '@/types/vehicle';
 
 // API LAYER for vehicles.
 export const vehicleApi = {
@@ -9,6 +14,13 @@ export const vehicleApi = {
     const { data } = await http.get<ApiResponse<{ vehicles: Vehicle[] }>>(
       ENDPOINTS.VEHICLES.LIST,
       { params }
+    );
+    return data.data.vehicles;
+  },
+
+  mine: async (): Promise<Vehicle[]> => {
+    const { data } = await http.get<ApiResponse<{ vehicles: Vehicle[] }>>(
+      ENDPOINTS.VEHICLES.MINE
     );
     return data.data.vehicles;
   },
@@ -26,5 +38,17 @@ export const vehicleApi = {
       payload
     );
     return data.data.vehicle;
+  },
+
+  update: async (id: string, payload: UpdateVehiclePayload): Promise<Vehicle> => {
+    const { data } = await http.patch<ApiResponse<{ vehicle: Vehicle }>>(
+      ENDPOINTS.VEHICLES.UPDATE(id),
+      payload
+    );
+    return data.data.vehicle;
+  },
+
+  remove: async (id: string): Promise<void> => {
+    await http.delete<ApiResponse<{ id: string }>>(ENDPOINTS.VEHICLES.DELETE(id));
   },
 };

@@ -1,15 +1,14 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { useAppDispatch } from '@/store/hooks';
-import { fetchVehicles } from '@/store/actions/vehicleActions';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 
 const HERO_IMG =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuD9F-Vc1oYLH2SnzPyew7_x0OzwbIJ4EukIHb55tUsLs0cGgAdh2vschO2jK9Z3c9H67ncR9V2s0bbv38JsqW5soHpIfUaw0ubzjbN9ZIZ6MQTP2Zg5oFH6KVtRXwRAUARrZA0rflqYwENR5R3d0uvyTtxwiRtAa9znmLhX0aNK90F7lkgF8d2EgugF18K-he0YYQv0uOnAtd66F1UnHbCl1fA3_NPgyiv4b-yNy7xET5VU-MrD4RyLWQPL8uUNHneXHUtkcInJ4e0';
 
 export default function Hero() {
-  const dispatch = useAppDispatch();
+  const router = useRouter();
   const { t } = useTranslation();
   const [location, setLocation] = useState('');
   const [when, setWhen] = useState('');
@@ -17,9 +16,12 @@ export default function Hero() {
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
-    // Same layered flow: component → action → api → axios → backend (with query).
-    dispatch(fetchVehicles(type ? { type } : undefined));
-    document.getElementById('featured')?.scrollIntoView({ behavior: 'smooth' });
+    // Forward every filter to the dashboard, which owns full search/filter UI + results.
+    const params = new URLSearchParams();
+    if (type) params.set('type', type);
+    if (location) params.set('location', location);
+    if (when) params.set('pickupDate', when);
+    router.push(`/dashboard${params.toString() ? `?${params.toString()}` : ''}`);
   };
 
   return (
@@ -61,8 +63,8 @@ export default function Hero() {
               value={when}
               onChange={(e) => setWhen(e.target.value)}
               className="w-full py-3 border-none outline-none focus:ring-0 text-on-surface placeholder:text-secondary font-body-md"
-              placeholder={t('home.when')}
-              type="text"
+              title={t('home.when')}
+              type="date"
             />
           </div>
           <div className="w-full flex-1 flex items-center px-4">
