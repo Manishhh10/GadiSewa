@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 
 // Leaflet's default marker icon references relative image paths that break
@@ -18,24 +17,14 @@ const markerIcon = new L.Icon({
 
 const NEPAL_CENTER: [number, number] = [28.3949, 84.124];
 
-function ClickHandler({ onPick }: { onPick: (lat: number, lng: number) => void }) {
-  useMapEvents({
-    click(e) {
-      onPick(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-}
-
-/** Recenters the map imperatively when `center` changes from outside (e.g. a search result). */
-function Recenter({ center }: { center: [number, number] | null }) {
-  const map = useMapEvents({});
-  useEffect(() => {
-    if (center) map.setView(center, 14);
-  }, [center, map]);
-  return null;
-}
-
+/**
+ * A thin, manually-managed wrapper around Leaflet (not react-leaflet's
+ * <MapContainer>). react-leaflet's MapContainer doesn't reliably tear down
+ * its Leaflet instance across React 18 Strict Mode's dev-time double-mount,
+ * which throws "Map container is already initialized" on the second mount.
+ * Managing the instance ourselves with an explicit `map.remove()` cleanup
+ * sidesteps that entirely.
+ */
 export default function LeafletMapCore({
   position,
   onPick,
@@ -47,22 +36,62 @@ export default function LeafletMapCore({
   interactive?: boolean;
   zoom?: number;
 }) {
-  return (
-    <MapContainer
-      center={position ?? NEPAL_CENTER}
-      zoom={position ? zoom : 7}
-      scrollWheelZoom={interactive}
-      dragging={interactive}
-      doubleClickZoom={interactive}
-      style={{ height: '100%', width: '100%' }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {position && <Marker position={position} icon={markerIcon} />}
-      {interactive && onPick && <ClickHandler onPick={onPick} />}
-      {interactive && <Recenter center={position} />}
-    </MapContainer>
-  );
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+  const onPickRef = useRef(onPick);
+  onPickRef.current = onPick;
+
+  // Create the map once per mount; always fully tear it down on unmount.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const map = L.map(el, {
+      scrollWheelZoom: interactive,
+      dragging: interactive,
+      doubleClickZoom: interactive,
+      zoomControl: interactive,
+    }).setView(position ?? NEPAL_CENTER, position ? zoom : 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    if (position) {
+      markerRef.current = L.marker(position, { icon: markerIcon }).addTo(map);
+    }
+
+    if (interactive) {
+      map.on('click', (e: L.LeafletMouseEvent) => {
+        onPickRef.current?.(e.latlng.lat, e.latlng.lng);
+      });
+    }
+
+    mapRef.current = map;
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      markerRef.current = null;
+    };
+    // Only re-run if interactivity mode itself changes — position updates are
+    // handled by the effect below without tearing down the whole map.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [interactive]);
+
+  // Move (or create) the marker and recenter when `position` changes, without recreating the map.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !position) return;
+
+    if (markerRef.current) {
+      markerRef.current.setLatLng(position);
+    } else {
+      markerRef.current = L.marker(position, { icon: markerIcon }).addTo(map);
+    }
+    map.setView(position, Math.max(map.getZoom(), zoom));
+  }, [position, zoom]);
+
+  return <div ref={containerRef} style={{ height: '100%', width: '100%' }} />;
 }
