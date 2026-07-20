@@ -12,3 +12,6 @@ export interface Overview {
   revenue: number;
   avgRating: number;
 }
+
+/** Same shape minus `users` — a vendor doesn't get a platform-wide user count. */
+export type VendorOverview = Omit<Overview, 'users'>;

@@ -11,18 +11,18 @@ import { rs } from '@/lib/format';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchVendorBookings, updateBookingStatus } from '@/store/actions/bookingActions';
 import { fmtDate } from '@/lib/format';
-import type { Overview } from '@/types/stats';
+import type { VendorOverview } from '@/types/stats';
 
 const fmtK = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
 
 export default function VendorDashboardPage() {
-  const [o, setO] = useState<Overview | null>(null);
+  const [o, setO] = useState<VendorOverview | null>(null);
   const dispatch = useAppDispatch();
   const { vendorItems, vendorLoading, vendorError } = useAppSelector((s) => s.bookings);
   const [actingOn, setActingOn] = useState<string | null>(null);
 
   useEffect(() => {
-    statsApi.overview().then(setO).catch(() => {});
+    statsApi.vendorOverview().then(setO).catch(() => {});
     dispatch(fetchVendorBookings());
   }, [dispatch]);
 

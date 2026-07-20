@@ -35,6 +35,7 @@ export const ENDPOINTS = {
   },
   STATS: {
     OVERVIEW: '/api/stats/overview',
+    VENDOR: '/api/stats/vendor',
   },
   ADMIN: {
     APPLICATIONS: '/api/admin/applications',
