@@ -9,7 +9,9 @@ export interface IVendorApplication extends Document {
   phone: string;
   vehicleCount: number;
   message: string;
+  documentUrl: string;
   status: ApplicationStatus;
+  rejectionReason?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,11 +24,13 @@ const schema = new Schema<IVendorApplication>(
     phone: { type: String, required: true },
     vehicleCount: { type: Number, default: 1 },
     message: { type: String, default: '' },
+    documentUrl: { type: String, required: true },
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
     },
+    rejectionReason: { type: String },
   },
   { timestamps: true }
 );

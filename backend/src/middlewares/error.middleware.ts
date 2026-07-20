@@ -32,7 +32,7 @@ export function errorHandler(
   }
 
   // Multer upload errors (file too large, too many files, bad type from fileFilter)
-  if (err.name === 'MulterError' || message === 'Only JPEG, PNG and WEBP images are allowed') {
+  if (err.name === 'MulterError' || message === 'Only JPEG, PNG, WEBP images or PDF documents are allowed') {
     statusCode = 400;
   }
 

@@ -4,7 +4,7 @@ import { Vehicle } from '../models/Vehicle';
 import { User } from '../models/User';
 import { AppError } from '../utils/AppError';
 import { sendMail } from '../utils/mailer';
-import { vendorApprovedEmail } from '../utils/emailTemplates';
+import { vendorApprovedEmail, vendorRejectedEmail } from '../utils/emailTemplates';
 
 /** GET /api/admin/applications?status=pending */
 export async function getApplications(req: Request, res: Response, next: NextFunction) {
@@ -20,26 +20,36 @@ export async function getApplications(req: Request, res: Response, next: NextFun
   }
 }
 
-/** PATCH /api/admin/applications/:id  { status } — approve/reject (approve promotes user to vendor) */
+/** PATCH /api/admin/applications/:id  { status, reason? } — approve/reject (approve promotes user to vendor) */
 export async function updateApplication(req: Request, res: Response, next: NextFunction) {
   try {
-    const { status } = req.body;
+    const { status, reason } = req.body;
     if (!['approved', 'rejected', 'pending'].includes(status)) {
       throw new AppError('status must be approved, rejected or pending', 400);
     }
+    if (status === 'rejected' && !String(reason || '').trim()) {
+      throw new AppError('A reason is required when rejecting an application', 400);
+    }
+
     const application = await VendorApplication.findById(req.params.id);
     if (!application) throw new AppError('Application not found', 404);
 
     application.status = status;
+    application.rejectionReason = status === 'rejected' ? String(reason).trim() : undefined;
     await application.save();
 
-    if (status === 'approved') {
-      const user = await User.findByIdAndUpdate(application.user, { role: 'vendor' });
-      if (user) {
-        sendMail(user.email, "You're a Verified Vendor! — GadiSewa", vendorApprovedEmail()).catch(
-          (err) => console.error('Failed to send vendor-approved email:', err)
-        );
-      }
+    const user = await User.findById(application.user);
+    if (status === 'approved' && user) {
+      await User.findByIdAndUpdate(application.user, { role: 'vendor' });
+      sendMail(user.email, "You're a Verified Vendor! — GadiSewa", vendorApprovedEmail()).catch(
+        (err) => console.error('Failed to send vendor-approved email:', err)
+      );
+    } else if (status === 'rejected' && user) {
+      sendMail(
+        user.email,
+        'Your GadiSewa vendor application',
+        vendorRejectedEmail(application.rejectionReason || '')
+      ).catch((err) => console.error('Failed to send vendor-rejected email:', err));
     }
 
     res.json({ success: true, message: `Application ${status}`, data: { application } });

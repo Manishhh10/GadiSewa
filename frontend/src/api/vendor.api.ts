@@ -11,4 +11,11 @@ export const vendorApi = {
     );
     return data.data.application;
   },
+
+  myApplications: async (): Promise<VendorApplication[]> => {
+    const { data } = await http.get<ApiResponse<{ applications: VendorApplication[] }>>(
+      ENDPOINTS.VENDOR.APPLICATIONS
+    );
+    return data.data.applications;
+  },
 };

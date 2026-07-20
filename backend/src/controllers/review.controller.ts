@@ -65,35 +65,3 @@ export async function getVehicleReviews(req: Request, res: Response, next: NextF
     next(err);
   }
 }
-
-/** GET /api/admin/reviews — all reviews, for moderation */
-export async function getAllReviews(req: Request, res: Response, next: NextFunction) {
-  try {
-    const reviews = await Review.find()
-      .populate('user', 'fullName username')
-      .populate('vehicle', 'name')
-      .sort({ createdAt: -1 });
-    res.json({ success: true, message: 'Reviews fetched', data: { reviews } });
-  } catch (err) {
-    next(err);
-  }
-}
-
-/** PATCH /api/admin/reviews/:id  { hidden }  — moderate a review */
-export async function setReviewHidden(req: Request, res: Response, next: NextFunction) {
-  try {
-    const hidden = Boolean(req.body.hidden);
-    const review = await Review.findByIdAndUpdate(req.params.id, { hidden }, { new: true });
-    if (!review) throw new AppError('Review not found', 404);
-
-    await recomputeVehicleRating(String(review.vehicle));
-
-    res.json({
-      success: true,
-      message: hidden ? 'Review hidden' : 'Review restored',
-      data: { review },
-    });
-  } catch (err) {
-    next(err);
-  }
-}

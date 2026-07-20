@@ -8,7 +8,6 @@ import StatCard from '@/components/dashboard/StatCard';
 import { statsApi } from '@/api/stats.api';
 import { adminApi } from '@/api/admin.api';
 import { vehicleApi } from '@/api/vehicle.api';
-import { rs } from '@/lib/format';
 import type { Overview } from '@/types/stats';
 import type { AdminApplication, AdminVehicle } from '@/types/admin';
 
@@ -16,7 +15,6 @@ const LINKS = [
   { icon: 'how_to_reg', label: 'Review Vendor Applications', href: '/admin/applications' },
   { icon: 'fact_check', label: 'Review Vehicle Listings', href: '/admin/listings' },
   { icon: 'gavel', label: 'Resolve Disputes', href: '/admin/disputes' },
-  { icon: 'reviews', label: 'Monitor Reviews', href: '/admin/reviews' },
 ];
 
 type QueueItem =
@@ -74,18 +72,25 @@ export default function AdminDashboardPage() {
   };
 
   const reject = async (item: QueueItem) => {
-    setActingOn(item.id);
-    try {
-      if (item.kind === 'application') {
-        await adminApi.updateApplication(item.id, 'rejected');
+    if (item.kind === 'application') {
+      const reason = window.prompt(`Reason for rejecting "${item.name}"? (the applicant will see this)`);
+      if (!reason || !reason.trim()) return;
+      setActingOn(item.id);
+      try {
+        await adminApi.updateApplication(item.id, 'rejected', reason.trim());
         setApplications((prev) => prev.filter((a) => a._id !== item.id));
-      } else {
-        if (!window.confirm(`Remove the listing "${item.name}"?`)) return;
+      } finally {
+        setActingOn(null);
+      }
+    } else {
+      if (!window.confirm(`Remove the listing "${item.name}"?`)) return;
+      setActingOn(item.id);
+      try {
         await vehicleApi.remove(item.id);
         setVehicles((prev) => prev.filter((v) => v._id !== item.id));
+      } finally {
+        setActingOn(null);
       }
-    } finally {
-      setActingOn(null);
     }
   };
 
@@ -99,11 +104,10 @@ export default function AdminDashboardPage() {
         </header>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-stack-md">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-stack-md">
           <StatCard icon="group" label="Total Users" value={o?.users ?? '—'} />
           <StatCard icon="directions_car" label="Vehicles" value={o?.vehicles ?? '—'} accent="text-tertiary" />
           <StatCard icon="receipt_long" label="Bookings" value={o?.bookings.total ?? '—'} accent="text-on-primary-fixed-variant" />
-          <StatCard icon="payments" label="Revenue (NPR)" value={o ? rs(o.revenue).replace('Rs. ', '') : '—'} />
           <StatCard icon="pending_actions" label="Pending" value={o?.bookings.pending ?? '—'} accent="text-error" />
         </div>
 

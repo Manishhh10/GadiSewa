@@ -14,11 +14,12 @@ export const adminApi = {
 
   updateApplication: async (
     id: string,
-    status: 'approved' | 'rejected'
+    status: 'approved' | 'rejected',
+    reason?: string
   ): Promise<AdminApplication> => {
     const { data } = await http.patch<ApiResponse<{ application: AdminApplication }>>(
       ENDPOINTS.ADMIN.APPLICATION(id),
-      { status }
+      { status, reason }
     );
     return data.data.application;
   },

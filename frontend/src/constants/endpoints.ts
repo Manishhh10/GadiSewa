@@ -42,8 +42,6 @@ export const ENDPOINTS = {
     APPLICATION: (id: string) => `/api/admin/applications/${id}`,
     VEHICLES: '/api/admin/vehicles',
     VERIFY_VEHICLE: (id: string) => `/api/admin/vehicles/${id}/verify`,
-    REVIEWS: '/api/admin/reviews',
-    REVIEW: (id: string) => `/api/admin/reviews/${id}`,
     ISSUES: '/api/admin/issues',
     DISPUTES: '/api/admin/disputes',
     DISPUTE: (id: string) => `/api/admin/disputes/${id}`,

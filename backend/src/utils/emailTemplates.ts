@@ -58,3 +58,16 @@ export function vendorApprovedEmail() {
   `;
   return wrap('#2e7d32', '🎉', "You're a Verified Vendor!", 'Welcome to the GadiSewa partner network.', body);
 }
+
+export function vendorRejectedEmail(reason: string) {
+  const body = `
+    <p style="font-size:15px;color:#222;">Thanks for your interest in becoming a GadiSewa vendor. Unfortunately, we're not able to approve your application at this time.</p>
+    <div style="background:#fdf2f2;border-left:4px solid #d32f2f;border-radius:8px;padding:14px 16px;margin:16px 0;">
+      <p style="font-size:13px;color:#888;margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em;">Reason</p>
+      <p style="font-size:15px;color:#222;margin:0;">${reason}</p>
+    </div>
+    <p style="font-size:15px;color:#222;">You're welcome to address the issue above and submit a new application.</p>
+    ${button(`${env.CLIENT_URL}/vendor/apply`, 'Apply Again')}
+  `;
+  return wrap('#d32f2f', 'ℹ️', 'Application Update', 'Your GadiSewa vendor application', body);
+}

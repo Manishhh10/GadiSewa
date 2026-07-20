@@ -13,7 +13,10 @@ export interface AdminApplication {
   phone: string;
   vehicleCount: number;
   message: string;
+  /** Absent on applications submitted before this was required. */
+  documentUrl?: string;
   status: 'pending' | 'approved' | 'rejected';
+  rejectionReason?: string;
   createdAt: string;
   user: AdminUser | null;
 }

@@ -10,7 +10,10 @@ if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
-const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+// Vehicle photos are images only; vendor application ID documents (citizenship/
+// passport/national ID) may also be a scanned PDF, so both go through this
+// same generic set of allowed types.
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const storage = multer.diskStorage({
@@ -23,7 +26,7 @@ const storage = multer.diskStorage({
 
 function fileFilter(_req: Request, file: Express.Multer.File, cb: FileFilterCallback) {
   if (!ALLOWED_TYPES.has(file.mimetype)) {
-    cb(new Error('Only JPEG, PNG and WEBP images are allowed'));
+    cb(new Error('Only JPEG, PNG, WEBP images or PDF documents are allowed'));
     return;
   }
   cb(null, true);

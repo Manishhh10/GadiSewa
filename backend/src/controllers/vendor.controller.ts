@@ -5,9 +5,15 @@ import { AppError } from '../utils/AppError';
 /** POST /api/vendor/applications  (protected) */
 export async function createApplication(req: Request, res: Response, next: NextFunction) {
   try {
-    const { fullName, businessName, phone, vehicleCount, message } = req.body;
+    const { fullName, businessName, phone, vehicleCount, message, documentUrl } = req.body;
     if (!fullName || !businessName || !phone) {
       throw new AppError('fullName, businessName and phone are required', 400);
+    }
+    if (!documentUrl) {
+      throw new AppError(
+        'A government ID document (citizenship, passport or national ID) is required',
+        400
+      );
     }
 
     const application = await VendorApplication.create({
@@ -17,6 +23,7 @@ export async function createApplication(req: Request, res: Response, next: NextF
       phone,
       vehicleCount: Number(vehicleCount) || 1,
       message: message || '',
+      documentUrl,
     });
 
     res.status(201).json({

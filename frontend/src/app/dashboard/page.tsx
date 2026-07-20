@@ -36,7 +36,12 @@ function RenterDashboardContent() {
   const [q, setQ] = useState('');
   const [location, setLocation] = useState('');
   const [pickupDate, setPickupDate] = useState('');
+  const [minPrice, setMinPrice] = useState(MIN_PRICE);
   const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
+
+  // Clamp so min never exceeds max (from either the slider or manual typing).
+  const setMinPriceClamped = (v: number) => setMinPrice(Math.min(Math.max(v, 0), maxPrice));
+  const setMaxPriceClamped = (v: number) => setMaxPrice(Math.max(Math.min(v, MAX_PRICE), minPrice));
 
   // Pick up filters forwarded from the homepage search bar, once, on mount.
   useEffect(() => {
@@ -55,6 +60,7 @@ function RenterDashboardContent() {
         type: type === 'All' ? undefined : type,
         q: q || undefined,
         location: location || undefined,
+        minPrice: minPrice > MIN_PRICE ? minPrice : undefined,
         maxPrice: maxPrice < MAX_PRICE ? maxPrice : undefined,
         pickupDate: pickupDate || undefined,
         returnDate: pickupDate ? addDaysISO(pickupDate, 1) : undefined,
@@ -67,7 +73,7 @@ function RenterDashboardContent() {
     // refetch whenever a filter that isn't the free-text search box changes
     // (the search box refetches on form submit instead, to avoid a request per keystroke)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, type, location, pickupDate, maxPrice]);
+  }, [dispatch, type, location, pickupDate, minPrice, maxPrice]);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -141,16 +147,37 @@ function RenterDashboardContent() {
               <span className="font-label-md text-label-md text-outline uppercase tracking-wider">
                 {t('dashboard.priceRange')}
               </span>
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  type="number"
+                  min={0}
+                  max={maxPrice}
+                  value={minPrice}
+                  onChange={(e) => setMinPriceClamped(Number(e.target.value) || 0)}
+                  className="w-full min-w-0 px-2 py-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-low font-body-sm text-body-sm"
+                  aria-label="Minimum price"
+                />
+                <span className="text-on-surface-variant shrink-0">–</span>
+                <input
+                  type="number"
+                  min={minPrice}
+                  max={MAX_PRICE}
+                  value={maxPrice}
+                  onChange={(e) => setMaxPriceClamped(Number(e.target.value) || 0)}
+                  className="w-full min-w-0 px-2 py-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-low font-body-sm text-body-sm"
+                  aria-label="Maximum price"
+                />
+              </div>
               <input
                 type="range"
                 min={MIN_PRICE}
                 max={MAX_PRICE}
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
-                className="w-full accent-primary mt-2"
+                onChange={(e) => setMaxPriceClamped(Number(e.target.value))}
+                className="w-full accent-primary mt-3"
               />
               <div className="flex justify-between font-body-sm text-body-sm text-on-surface-variant">
-                <span>{MIN_PRICE}</span>
+                <span>{minPrice.toLocaleString()}</span>
                 <span>{maxPrice >= MAX_PRICE ? `${MAX_PRICE.toLocaleString()}+` : maxPrice.toLocaleString()}</span>
               </div>
             </div>

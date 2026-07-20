@@ -1,17 +1,24 @@
+interface BookingCounts {
+  total: number;
+  pending: number;
+  confirmed: number;
+  active: number;
+  completed: number;
+  cancelled: number;
+}
+
+/** Admin's platform-wide overview — no revenue, that's a vendor's own concern, not the platform operator's. */
 export interface Overview {
   vehicles: number;
   users: number;
-  bookings: {
-    total: number;
-    pending: number;
-    confirmed: number;
-    active: number;
-    completed: number;
-    cancelled: number;
-  };
-  revenue: number;
+  bookings: BookingCounts;
   avgRating: number;
 }
 
-/** Same shape minus `users` — a vendor doesn't get a platform-wide user count. */
-export type VendorOverview = Omit<Overview, 'users'>;
+/** A vendor's own fleet — includes revenue, which matters to them specifically. */
+export interface VendorOverview {
+  vehicles: number;
+  bookings: BookingCounts;
+  revenue: number;
+  avgRating: number;
+}
