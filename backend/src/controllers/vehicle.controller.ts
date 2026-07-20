@@ -65,7 +65,10 @@ export async function getMyVehicles(req: Request, res: Response, next: NextFunct
 /** GET /api/vehicles/:id */
 export async function getVehicleById(req: Request, res: Response, next: NextFunction) {
   try {
-    const vehicle = await Vehicle.findById(req.params.id);
+    const vehicle = await Vehicle.findById(req.params.id).populate(
+      'owner',
+      'fullName phone email'
+    );
     if (!vehicle) throw new AppError('Vehicle not found', 404);
 
     res.json({ success: true, message: 'Vehicle fetched', data: { vehicle } });

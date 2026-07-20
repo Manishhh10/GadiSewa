@@ -43,6 +43,7 @@ export default function VehicleDetailsPage() {
     selectedError: error,
   } = useAppSelector((s) => s.vehicles);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const owner = v && typeof v.owner === 'object' ? v.owner : null;
 
   useEffect(() => {
     dispatch(fetchVehicleById(id));
@@ -218,9 +219,22 @@ export default function VehicleDetailsPage() {
                           <Stat icon="history" text={`${v.host.bookings}+ Bookings`} />
                         </div>
                       </div>
-                      <button className="font-label-md text-label-md border border-primary text-primary px-6 py-2 rounded-lg hover:bg-primary/5 transition-colors">
-                        {t('vehicleDetail.contactHost')}
-                      </button>
+                      {owner?.email || owner?.phone ? (
+                        <a
+                          href={owner.email ? `mailto:${owner.email}` : `tel:${owner.phone}`}
+                          className="font-label-md text-label-md border border-primary text-primary px-6 py-2 rounded-lg hover:bg-primary/5 transition-colors"
+                        >
+                          {t('vehicleDetail.contactHost')}
+                        </a>
+                      ) : (
+                        <button
+                          disabled
+                          title="No contact info on file for this host"
+                          className="font-label-md text-label-md border border-outline-variant text-on-surface-variant px-6 py-2 rounded-lg cursor-not-allowed"
+                        >
+                          {t('vehicleDetail.contactHost')}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
