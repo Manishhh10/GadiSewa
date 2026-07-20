@@ -11,7 +11,9 @@ import { fetchVehicleById } from '@/store/actions/vehicleActions';
 import { clearSelected } from '@/store/slices/vehicleSlice';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 import { reviewApi } from '@/api/review.api';
+import { bookingApi } from '@/api/booking.api';
 import LocationMap from '@/components/map/LocationMap';
+import ReviewPrompt from '@/components/review/ReviewPrompt';
 import type { Vehicle } from '@/types/vehicle';
 import type { Review } from '@/types/review';
 
@@ -44,7 +46,9 @@ export default function VehicleDetailsPage() {
     selectedError: error,
   } = useAppSelector((s) => s.vehicles);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewableBookingId, setReviewableBookingId] = useState<string | null>(null);
   const owner = v && typeof v.owner === 'object' ? v.owner : null;
+  const user = useAppSelector((s) => s.auth.user);
 
   useEffect(() => {
     dispatch(fetchVehicleById(id));
@@ -53,6 +57,25 @@ export default function VehicleDetailsPage() {
       dispatch(clearSelected());
     };
   }, [dispatch, id]);
+
+  // Find a completed booking of this vehicle by the current user that they can review.
+  useEffect(() => {
+    if (!user) {
+      setReviewableBookingId(null);
+      return;
+    }
+    bookingApi
+      .list()
+      .then((bookings) => {
+        const completed = bookings.find(
+          (b) => b.vehicle?._id === id && b.status === 'completed'
+        );
+        setReviewableBookingId(completed?._id ?? null);
+      })
+      .catch(() => setReviewableBookingId(null));
+  }, [id, user]);
+
+  const alreadyReviewed = !!user && reviews.some((r) => typeof r.user === 'object' && r.user._id === user.id);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -255,6 +278,25 @@ export default function VehicleDetailsPage() {
                   <h2 className="font-headline-sm text-headline-sm mb-3">
                     {t('vehicleDetail.reviewsHeading')} {reviews.length > 0 && `(${reviews.length})`}
                   </h2>
+
+                  <div className="mb-6 max-w-sm">
+                    {reviewableBookingId && !alreadyReviewed ? (
+                      <ReviewPrompt bookingId={reviewableBookingId} />
+                    ) : alreadyReviewed ? (
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        You&apos;ve already reviewed this vehicle. Thanks for your feedback!
+                      </p>
+                    ) : user ? (
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        You can leave a review once you&apos;ve completed a trip with this vehicle.
+                      </p>
+                    ) : (
+                      <p className="font-body-sm text-body-sm text-on-surface-variant">
+                        <Link href="/login" className="text-primary font-semibold hover:underline">Log in</Link> to leave a review after your trip.
+                      </p>
+                    )}
+                  </div>
+
                   {reviews.length === 0 ? (
                     <p className="font-body-md text-body-md text-on-surface-variant">
                       {t('vehicleDetail.noReviews')}
