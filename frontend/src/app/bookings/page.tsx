@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { cancelBooking, fetchMyBookings } from '@/store/actions/bookingActions';
 import { fmtDate, rs } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { useToast } from '@/lib/toast/ToastContext';
 import ReviewPrompt from '@/components/review/ReviewPrompt';
 import type { Booking, BookingStatus } from '@/types/booking';
 
@@ -115,14 +116,20 @@ export default function MyBookingsPage() {
 function BookingCard({ booking: b }: { booking: Booking }) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const [cancelling, setCancelling] = useState(false);
   const canCancel = b.status === 'pending' || b.status === 'confirmed';
 
   const onCancel = async () => {
     if (!window.confirm(t('bookings.cancelConfirm'))) return;
     setCancelling(true);
-    await dispatch(cancelBooking(b._id));
+    const result = await dispatch(cancelBooking(b._id));
     setCancelling(false);
+    if (cancelBooking.fulfilled.match(result)) {
+      toast.success('Booking cancelled.');
+    } else {
+      toast.error(result.payload ?? 'Could not cancel this booking.');
+    }
   };
 
   return (

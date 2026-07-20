@@ -12,12 +12,14 @@ import LocationPicker, { type PickedLocation } from '@/components/map/LocationPi
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deleteVehicle, fetchMyVehicles, updateVehicle } from '@/store/actions/vehicleActions';
 import { rs } from '@/lib/format';
+import { useToast } from '@/lib/toast/ToastContext';
 import type { Vehicle, VehicleType } from '@/types/vehicle';
 
 const TYPES: VehicleType[] = ['Bike', 'Car', 'SUV', 'Van', 'Truck'];
 
 export default function MyVehiclesPage() {
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const { mine, mineLoading, mineError } = useAppSelector((s) => s.vehicles);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -27,7 +29,12 @@ export default function MyVehiclesPage() {
 
   const onDelete = async (v: Vehicle) => {
     if (!window.confirm(`Delete "${v.name}"? This cannot be undone.`)) return;
-    await dispatch(deleteVehicle(v._id));
+    const result = await dispatch(deleteVehicle(v._id));
+    if (deleteVehicle.fulfilled.match(result)) {
+      toast.success(`Removed "${v.name}".`);
+    } else {
+      toast.error(result.payload ?? 'Could not delete this vehicle.');
+    }
   };
 
   return (
@@ -124,6 +131,7 @@ export default function MyVehiclesPage() {
 
 function EditVehicleCard({ vehicle, onDone }: { vehicle: Vehicle; onDone: () => void }) {
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const [form, setForm] = useState({
     name: vehicle.name,
     type: vehicle.type,
@@ -145,7 +153,7 @@ function EditVehicleCard({ vehicle, onDone }: { vehicle: Vehicle; onDone: () => 
 
   const onSave = async () => {
     setSaving(true);
-    await dispatch(
+    const result = await dispatch(
       updateVehicle({
         id: vehicle._id,
         payload: {
@@ -161,7 +169,12 @@ function EditVehicleCard({ vehicle, onDone }: { vehicle: Vehicle; onDone: () => 
       })
     );
     setSaving(false);
-    onDone();
+    if (updateVehicle.fulfilled.match(result)) {
+      toast.success(`Saved changes to "${form.name}".`);
+      onDone();
+    } else {
+      toast.error(result.payload ?? 'Could not save changes.');
+    }
   };
 
   return (

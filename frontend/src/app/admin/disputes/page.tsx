@@ -6,9 +6,12 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { disputeApi } from '@/api/support.api';
 import { rs } from '@/lib/format';
+import { useToast } from '@/lib/toast/ToastContext';
+import type { NormalizedError } from '@/lib/axios';
 import type { Dispute } from '@/types/support';
 
 export default function DisputesPage() {
+  const toast = useToast();
   const [disputes, setDisputes] = useState<Dispute[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +33,11 @@ export default function DisputesPage() {
     try {
       const updated = await disputeApi.resolve(id, resolution);
       setDisputes((prev) => prev.map((d) => (d._id === updated._id ? updated : d)));
+      toast.success(
+        resolution === 'refund_renter' ? 'Dispute resolved — renter refunded.' : 'Dispute resolved — sided with vendor.'
+      );
+    } catch (err) {
+      toast.error((err as NormalizedError).message);
     } finally {
       setActingOn(null);
     }

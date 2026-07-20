@@ -6,10 +6,12 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { adminApi } from '@/api/admin.api';
 import { rs } from '@/lib/format';
+import { useToast } from '@/lib/toast/ToastContext';
 import type { AdminVehicle } from '@/types/admin';
 import type { NormalizedError } from '@/lib/axios';
 
 export default function ReviewListingsPage() {
+  const toast = useToast();
   const [vehicles, setVehicles] = useState<AdminVehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,13 +25,14 @@ export default function ReviewListingsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const toggle = async (id: string, verified: boolean) => {
+  const toggle = async (id: string, name: string, verified: boolean) => {
     setBusy(id);
     try {
       const updated = await adminApi.verifyVehicle(id, verified);
       setVehicles((prev) => prev.map((v) => (v._id === id ? { ...v, verified: updated.verified } : v)));
+      toast.success(verified ? `Verified "${name}".` : `Unverified "${name}".`);
     } catch (e) {
-      setError((e as NormalizedError).message);
+      toast.error((e as NormalizedError).message);
     } finally {
       setBusy(null);
     }
@@ -77,11 +80,11 @@ export default function ReviewListingsPage() {
               </div>
               <div className="flex gap-2 shrink-0">
                 {v.verified ? (
-                  <button onClick={() => toggle(v._id, false)} disabled={busy === v._id} className="border border-outline text-on-surface-variant px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container disabled:opacity-60 transition-all">
+                  <button onClick={() => toggle(v._id, v.name, false)} disabled={busy === v._id} className="border border-outline text-on-surface-variant px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container disabled:opacity-60 transition-all">
                     Unverify
                   </button>
                 ) : (
-                  <button onClick={() => toggle(v._id, true)} disabled={busy === v._id} className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 disabled:opacity-60 transition-all">
+                  <button onClick={() => toggle(v._id, v.name, true)} disabled={busy === v._id} className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 disabled:opacity-60 transition-all">
                     Approve
                   </button>
                 )}

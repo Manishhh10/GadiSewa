@@ -10,29 +10,47 @@ import { statsApi } from '@/api/stats.api';
 import { rs } from '@/lib/format';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchVendorBookings, updateBookingStatus } from '@/store/actions/bookingActions';
+import { fetchMyVehicles } from '@/store/actions/vehicleActions';
 import { fmtDate } from '@/lib/format';
+import { useToast } from '@/lib/toast/ToastContext';
 import type { VendorOverview } from '@/types/stats';
+
+const ACTION_LABELS: Record<string, string> = {
+  confirmed: 'Booking accepted.',
+  cancelled: 'Booking declined.',
+  active: 'Trip started.',
+  completed: 'Trip marked complete — the renter can now leave a review.',
+};
 
 const fmtK = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
 
 export default function VendorDashboardPage() {
+  const toast = useToast();
   const [o, setO] = useState<VendorOverview | null>(null);
   const dispatch = useAppDispatch();
   const { vendorItems, vendorLoading, vendorError } = useAppSelector((s) => s.bookings);
+  const { mine } = useAppSelector((s) => s.vehicles);
   const [actingOn, setActingOn] = useState<string | null>(null);
 
   useEffect(() => {
     statsApi.vendorOverview().then(setO).catch(() => {});
     dispatch(fetchVendorBookings());
+    dispatch(fetchMyVehicles());
   }, [dispatch]);
 
   const activeBookings = vendorItems.filter((b) =>
     ['pending', 'confirmed', 'active'].includes(b.status)
   );
+  const pendingVehicles = mine.filter((v) => !v.verified);
 
   const act = async (id: string, status: 'confirmed' | 'active' | 'completed' | 'cancelled') => {
     setActingOn(id);
-    await dispatch(updateBookingStatus({ id, status }));
+    const result = await dispatch(updateBookingStatus({ id, status }));
+    if (updateBookingStatus.fulfilled.match(result)) {
+      toast.success(ACTION_LABELS[status] ?? 'Booking updated.');
+    } else {
+      toast.error(result.payload ?? 'Could not update this booking.');
+    }
     setActingOn(null);
   };
 
@@ -63,6 +81,19 @@ export default function VendorDashboardPage() {
             </Link>
           </div>
         </div>
+
+        {pendingVehicles.length > 0 && (
+          <Link
+            href="/vendor/vehicles"
+            className="flex items-center gap-3 bg-primary-container/10 border border-primary/30 text-primary px-4 py-3 rounded-xl font-body-sm text-body-sm hover:bg-primary-container/15 transition-colors"
+          >
+            <span className="material-symbols-outlined">hourglass_top</span>
+            {pendingVehicles.length === 1
+              ? `"${pendingVehicles[0].name}" is awaiting admin review before it goes live.`
+              : `${pendingVehicles.length} of your vehicles are awaiting admin review before they go live.`}
+            <span className="material-symbols-outlined ml-auto">chevron_right</span>
+          </Link>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-stack-md">
@@ -154,18 +185,30 @@ export default function VendorDashboardPage() {
             </div>
           </section>
 
-          {/* Quality report */}
+          {/* Quality report — only real, computed figures; no invented stats */}
           <section className="space-y-stack-md">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Monthly Quality Report</h2>
+            <h2 className="font-headline-md text-headline-md text-on-surface">Quality Report</h2>
             <div className="bg-primary text-white p-stack-lg rounded-xl shadow-lg space-y-4">
               <span className="material-symbols-outlined text-[40px]">workspace_premium</span>
-              <p className="font-headline-sm text-headline-sm">You&apos;re a Top-Rated Vendor!</p>
-              <p className="font-body-sm text-body-sm opacity-90">
-                Maintain a {o?.avgRating ?? '4.8'}+ rating and 95% response rate to keep your premium badge and ranking.
-              </p>
+              {o && o.avgRating > 0 ? (
+                <>
+                  <p className="font-headline-sm text-headline-sm">You&apos;re a Top-Rated Vendor!</p>
+                  <p className="font-body-sm text-body-sm opacity-90">
+                    Keep it up — maintain a strong rating to stand out to renters.
+                  </p>
+                </>
+              ) : (
+                <p className="font-body-sm text-body-sm opacity-90">
+                  Your average rating will appear here once renters start reviewing completed trips.
+                </p>
+              )}
               <div className="bg-white/15 rounded-lg p-3 flex items-center justify-between">
-                <span className="font-body-sm text-body-sm">Response Rate</span>
-                <span className="font-headline-sm text-headline-sm">98%</span>
+                <span className="font-body-sm text-body-sm">Average Rating</span>
+                <span className="font-headline-sm text-headline-sm">{o && o.avgRating > 0 ? `${o.avgRating} ★` : '—'}</span>
+              </div>
+              <div className="bg-white/15 rounded-lg p-3 flex items-center justify-between">
+                <span className="font-body-sm text-body-sm">Completed Trips</span>
+                <span className="font-headline-sm text-headline-sm">{o?.bookings.completed ?? '—'}</span>
               </div>
             </div>
           </section>

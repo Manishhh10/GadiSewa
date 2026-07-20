@@ -5,9 +5,12 @@ import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import StatCard from '@/components/dashboard/StatCard';
+import ApplicationActions from '@/components/admin/ApplicationActions';
 import { statsApi } from '@/api/stats.api';
 import { adminApi } from '@/api/admin.api';
 import { vehicleApi } from '@/api/vehicle.api';
+import { useToast } from '@/lib/toast/ToastContext';
+import type { NormalizedError } from '@/lib/axios';
 import type { Overview } from '@/types/stats';
 import type { AdminApplication, AdminVehicle } from '@/types/admin';
 
@@ -17,11 +20,8 @@ const LINKS = [
   { icon: 'gavel', label: 'Resolve Disputes', href: '/admin/disputes' },
 ];
 
-type QueueItem =
-  | { kind: 'application'; id: string; name: string; date: string }
-  | { kind: 'vehicle'; id: string; name: string; date: string };
-
 export default function AdminDashboardPage() {
+  const toast = useToast();
   const [o, setO] = useState<Overview | null>(null);
   const [applications, setApplications] = useState<AdminApplication[]>([]);
   const [vehicles, setVehicles] = useState<AdminVehicle[]>([]);
@@ -41,58 +41,38 @@ export default function AdminDashboardPage() {
 
   useEffect(load, []);
 
-  const queue: QueueItem[] = [
-    ...applications.map((a) => ({
-      kind: 'application' as const,
-      id: a._id,
-      name: a.businessName,
-      date: new Date(a.createdAt).toLocaleDateString(),
-    })),
-    ...vehicles.map((v) => ({
-      kind: 'vehicle' as const,
-      id: v._id,
-      name: `${v.name} — new listing`,
-      date: '',
-    })),
-  ];
+  const onApplicationUpdated = (updated: AdminApplication) => {
+    setApplications((prev) => prev.filter((a) => a._id !== updated._id));
+  };
 
-  const approve = async (item: QueueItem) => {
-    setActingOn(item.id);
+  const approveVehicle = async (v: AdminVehicle) => {
+    setActingOn(v._id);
     try {
-      if (item.kind === 'application') {
-        await adminApi.updateApplication(item.id, 'approved');
-        setApplications((prev) => prev.filter((a) => a._id !== item.id));
-      } else {
-        await adminApi.verifyVehicle(item.id, true);
-        setVehicles((prev) => prev.filter((v) => v._id !== item.id));
-      }
+      await adminApi.verifyVehicle(v._id, true);
+      setVehicles((prev) => prev.filter((x) => x._id !== v._id));
+      toast.success(`Verified "${v.name}" — the Verified badge is now live.`);
+    } catch (err) {
+      toast.error((err as NormalizedError).message);
     } finally {
       setActingOn(null);
     }
   };
 
-  const reject = async (item: QueueItem) => {
-    if (item.kind === 'application') {
-      const reason = window.prompt(`Reason for rejecting "${item.name}"? (the applicant will see this)`);
-      if (!reason || !reason.trim()) return;
-      setActingOn(item.id);
-      try {
-        await adminApi.updateApplication(item.id, 'rejected', reason.trim());
-        setApplications((prev) => prev.filter((a) => a._id !== item.id));
-      } finally {
-        setActingOn(null);
-      }
-    } else {
-      if (!window.confirm(`Remove the listing "${item.name}"?`)) return;
-      setActingOn(item.id);
-      try {
-        await vehicleApi.remove(item.id);
-        setVehicles((prev) => prev.filter((v) => v._id !== item.id));
-      } finally {
-        setActingOn(null);
-      }
+  const removeVehicle = async (v: AdminVehicle) => {
+    if (!window.confirm(`Remove the listing "${v.name}"?`)) return;
+    setActingOn(v._id);
+    try {
+      await vehicleApi.remove(v._id);
+      setVehicles((prev) => prev.filter((x) => x._id !== v._id));
+      toast.success(`Removed "${v.name}".`);
+    } catch (err) {
+      toast.error((err as NormalizedError).message);
+    } finally {
+      setActingOn(null);
     }
   };
+
+  const queueCount = applications.length + vehicles.length;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -115,44 +95,61 @@ export default function AdminDashboardPage() {
           {/* Moderation queue */}
           <section className="lg:col-span-2 space-y-stack-md">
             <div className="flex items-center justify-between">
-              <h2 className="font-headline-md text-headline-md text-on-surface">Pending Approvals</h2>
+              <h2 className="font-headline-md text-headline-md text-on-surface">
+                Pending Approvals {queueCount > 0 && `(${queueCount})`}
+              </h2>
             </div>
 
             {loading && <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>}
-            {!loading && queue.length === 0 && (
+            {!loading && queueCount === 0 && (
               <p className="font-body-sm text-body-sm text-on-surface-variant">Nothing pending review right now.</p>
             )}
 
             <div className="space-y-stack-sm">
-              {queue.map((q) => (
+              {applications.map((a) => (
                 <div
-                  key={`${q.kind}-${q.id}`}
+                  key={`application-${a._id}`}
+                  className="bg-surface-container-low p-stack-md rounded-xl border border-outline-variant/30 flex flex-col gap-3 shadow-[0px_4px_12px_rgba(0,0,0,0.05)]"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center">
+                      <span className="material-symbols-outlined text-primary">storefront</span>
+                    </div>
+                    <div>
+                      <div className="font-label-md text-label-md text-on-surface">{a.businessName}</div>
+                      <div className="font-body-sm text-body-sm text-on-surface-variant">
+                        Vendor Application • {new Date(a.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                  <ApplicationActions application={a} onUpdated={onApplicationUpdated} />
+                </div>
+              ))}
+              {vehicles.map((v) => (
+                <div
+                  key={`vehicle-${v._id}`}
                   className="bg-surface-container-low p-stack-md rounded-xl border border-outline-variant/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0px_4px_12px_rgba(0,0,0,0.05)]"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center">
-                      <span className="material-symbols-outlined text-primary">
-                        {q.kind === 'application' ? 'storefront' : 'directions_car'}
-                      </span>
+                      <span className="material-symbols-outlined text-primary">directions_car</span>
                     </div>
                     <div>
-                      <div className="font-label-md text-label-md text-on-surface">{q.name}</div>
-                      <div className="font-body-sm text-body-sm text-on-surface-variant">
-                        {q.kind === 'application' ? 'Vendor Application' : 'Vehicle Listing'} {q.date && `• ${q.date}`}
-                      </div>
+                      <div className="font-label-md text-label-md text-on-surface">{v.name} — new listing</div>
+                      <div className="font-body-sm text-body-sm text-on-surface-variant">Vehicle Listing</div>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <button
-                      disabled={actingOn === q.id}
-                      onClick={() => approve(q)}
+                      disabled={actingOn === v._id}
+                      onClick={() => approveVehicle(v)}
                       className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
                     >
                       Approve
                     </button>
                     <button
-                      disabled={actingOn === q.id}
-                      onClick={() => reject(q)}
+                      disabled={actingOn === v._id}
+                      onClick={() => removeVehicle(v)}
                       className="border border-error text-error px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-error/5 transition-colors disabled:opacity-50"
                     >
                       Reject

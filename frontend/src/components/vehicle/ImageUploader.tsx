@@ -71,10 +71,10 @@ export default function ImageUploader({
             <button
               type="button"
               onClick={() => remove(url)}
-              className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/80 transition-colors"
               aria-label="Remove photo"
             >
-              <span className="material-symbols-outlined text-[18px]">close</span>
+              <span className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
         ))}

@@ -15,7 +15,6 @@ import type { NormalizedError } from '@/lib/axios';
 import type { VehicleType } from '@/types/vehicle';
 
 const TYPES: VehicleType[] = ['Bike', 'Car', 'SUV', 'Van', 'Truck'];
-const STEPS = ['Photos', 'Documents', 'Details', 'Location', 'Review'];
 
 export default function AddVehiclePage() {
   const router = useRouter();
@@ -88,19 +87,21 @@ export default function AddVehiclePage() {
           </p>
         </div>
 
-        {/* Stepper (visual) */}
-        <div className="flex items-center justify-between mb-stack-lg overflow-x-auto pb-2">
-          {STEPS.map((s, i) => (
-            <div key={s} className="flex items-center gap-2 shrink-0">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center font-label-md text-label-md ${
-                  i === 2 ? 'bg-primary text-white' : 'border-2 border-outline-variant text-on-surface-variant'
-                }`}
-              >
-                {i + 1}
-              </div>
-              <span className={`font-label-md text-label-md whitespace-nowrap ${i === 2 ? 'text-primary' : 'text-on-surface-variant'}`}>{s}</span>
-              {i < STEPS.length - 1 && <div className="w-8 md:w-16 h-px bg-outline-variant mx-2" />}
+        {/* Section checklist — reflects real completion, not a fake multi-page wizard */}
+        <div className="flex flex-wrap items-center gap-3 mb-stack-lg">
+          {[
+            { label: 'Photos', done: images.length > 0 },
+            { label: 'Details', done: !!form.name && !!form.dailyRate },
+            { label: 'Location', done: !!location },
+          ].map((s) => (
+            <div
+              key={s.label}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-md text-label-md ${
+                s.done ? 'bg-tertiary-container/20 text-tertiary' : 'border border-outline-variant text-on-surface-variant'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">{s.done ? 'check_circle' : 'radio_button_unchecked'}</span>
+              {s.label}
             </div>
           ))}
         </div>

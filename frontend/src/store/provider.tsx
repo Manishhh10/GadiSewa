@@ -8,6 +8,7 @@ import { fetchMe } from './actions/authActions';
 import { authInitialized } from './slices/authSlice';
 import { TOKEN_KEY } from '@/lib/axios';
 import { I18nProvider } from '@/lib/i18n/I18nContext';
+import { ToastProvider } from '@/lib/toast/ToastContext';
 
 /** On app load, rehydrate the user from the stored token (if any). */
 function AuthBootstrap() {
@@ -26,8 +27,10 @@ export function ReduxProvider({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
       <I18nProvider>
-        <AuthBootstrap />
-        {children}
+        <ToastProvider>
+          <AuthBootstrap />
+          {children}
+        </ToastProvider>
       </I18nProvider>
     </Provider>
   );

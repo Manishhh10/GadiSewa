@@ -1,14 +1,28 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { vendorApi } from '@/api/vendor.api';
 
 export default function Navbar() {
   const { user } = useAppSelector((s) => s.auth);
   const dispatch = useAppDispatch();
   const { t, locale, toggleLocale } = useTranslation();
+  const [hasPendingApplication, setHasPendingApplication] = useState(false);
+
+  useEffect(() => {
+    if (user?.role !== 'renter') {
+      setHasPendingApplication(false);
+      return;
+    }
+    vendorApi
+      .myApplications()
+      .then((apps) => setHasPendingApplication(apps.some((a) => a.status === 'pending')))
+      .catch(() => {});
+  }, [user?.role]);
 
   return (
     <header className="bg-surface shadow-sm sticky top-0 z-50">
@@ -29,9 +43,15 @@ export default function Navbar() {
           </Link>
           <Link
             href={user?.role === 'vendor' || user?.role === 'admin' ? '/vendor' : '/vendor/apply'}
-            className="text-on-surface-variant font-medium hover:text-primary transition-colors font-label-md text-label-md"
+            className="relative text-on-surface-variant font-medium hover:text-primary transition-colors font-label-md text-label-md"
           >
             {t('nav.vendors')}
+            {hasPendingApplication && (
+              <span
+                title="Your vendor application is under review"
+                className="absolute -top-1 -right-2.5 w-2 h-2 rounded-full bg-primary"
+              />
+            )}
           </Link>
           {user?.role === 'admin' && (
             <Link
