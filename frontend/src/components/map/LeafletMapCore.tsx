@@ -39,6 +39,7 @@ export default function LeafletMapCore({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+  const readyRef = useRef(false);
   const onPickRef = useRef(onPick);
   onPickRef.current = onPick;
 
@@ -52,7 +53,15 @@ export default function LeafletMapCore({
       dragging: interactive,
       doubleClickZoom: interactive,
       zoomControl: interactive,
-    }).setView(position ?? NEPAL_CENTER, position ? zoom : 7);
+      // Animated pans/zooms complete asynchronously via requestAnimationFrame;
+      // if the component unmounts (e.g. navigating away right after submit)
+      // while one is in flight, Leaflet's callback fires against DOM nodes
+      // that no longer exist and throws. Instant transitions avoid that class
+      // of bug entirely — an acceptable trade for a small picker/preview map.
+      fadeAnimation: false,
+      zoomAnimation: false,
+      markerZoomAnimation: false,
+    }).setView(position ?? NEPAL_CENTER, position ? zoom : 7, { animate: false });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -69,8 +78,10 @@ export default function LeafletMapCore({
     }
 
     mapRef.current = map;
+    readyRef.current = true;
 
     return () => {
+      readyRef.current = false;
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
@@ -83,14 +94,14 @@ export default function LeafletMapCore({
   // Move (or create) the marker and recenter when `position` changes, without recreating the map.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !position) return;
+    if (!map || !readyRef.current || !position) return;
 
     if (markerRef.current) {
       markerRef.current.setLatLng(position);
     } else {
       markerRef.current = L.marker(position, { icon: markerIcon }).addTo(map);
     }
-    map.setView(position, Math.max(map.getZoom(), zoom));
+    map.setView(position, Math.max(map.getZoom(), zoom), { animate: false });
   }, [position, zoom]);
 
   return <div ref={containerRef} style={{ height: '100%', width: '100%' }} />;
