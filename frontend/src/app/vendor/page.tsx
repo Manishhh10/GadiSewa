@@ -26,9 +26,11 @@ export default function VendorDashboardPage() {
     dispatch(fetchVendorBookings());
   }, [dispatch]);
 
-  const pending = vendorItems.filter((b) => b.status === 'pending');
+  const activeBookings = vendorItems.filter((b) =>
+    ['pending', 'confirmed', 'active'].includes(b.status)
+  );
 
-  const act = async (id: string, status: 'confirmed' | 'cancelled') => {
+  const act = async (id: string, status: 'confirmed' | 'active' | 'completed' | 'cancelled') => {
     setActingOn(id);
     await dispatch(updateBookingStatus({ id, status }));
     setActingOn(null);
@@ -72,22 +74,22 @@ export default function VendorDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-stack-lg">
-          {/* Recent requests */}
+          {/* Bookings needing action, at any stage of the trip lifecycle */}
           <section className="lg:col-span-2 space-y-stack-md">
             <div className="flex items-center justify-between">
-              <h2 className="font-headline-md text-headline-md text-on-surface">Recent Booking Requests</h2>
+              <h2 className="font-headline-md text-headline-md text-on-surface">Bookings</h2>
             </div>
 
             {vendorLoading && <p className="font-body-sm text-body-sm text-on-surface-variant">Loading…</p>}
             {vendorError && !vendorLoading && (
               <p className="font-body-sm text-body-sm text-error">{vendorError}</p>
             )}
-            {!vendorLoading && !vendorError && pending.length === 0 && (
-              <p className="font-body-sm text-body-sm text-on-surface-variant">No pending booking requests right now.</p>
+            {!vendorLoading && !vendorError && activeBookings.length === 0 && (
+              <p className="font-body-sm text-body-sm text-on-surface-variant">No bookings in progress right now.</p>
             )}
 
             <div className="space-y-stack-sm">
-              {pending.map((b) => {
+              {activeBookings.map((b) => {
                 const renterName =
                   typeof b.user === 'object' ? b.user.fullName || b.user.username : 'Renter';
                 return (
@@ -104,25 +106,47 @@ export default function VendorDashboardPage() {
                           {b.vehicle.name} <span className="text-on-surface-variant">({renterName})</span>
                         </div>
                         <div className="font-body-sm text-body-sm text-on-surface-variant">
-                          {fmtDate(b.pickupDate)} – {fmtDate(b.returnDate)} • {rs(b.totalAmount)}
+                          {fmtDate(b.pickupDate)} – {fmtDate(b.returnDate)} • {rs(b.totalAmount)} • <span className="capitalize">{b.status}</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button
-                        disabled={actingOn === b._id}
-                        onClick={() => act(b._id, 'confirmed')}
-                        className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
-                      >
-                        Accept
-                      </button>
-                      <button
-                        disabled={actingOn === b._id}
-                        onClick={() => act(b._id, 'cancelled')}
-                        className="bg-error text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
-                      >
-                        Decline
-                      </button>
+                      {b.status === 'pending' && (
+                        <>
+                          <button
+                            disabled={actingOn === b._id}
+                            onClick={() => act(b._id, 'confirmed')}
+                            className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            disabled={actingOn === b._id}
+                            onClick={() => act(b._id, 'cancelled')}
+                            className="bg-error text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
+                          >
+                            Decline
+                          </button>
+                        </>
+                      )}
+                      {b.status === 'confirmed' && (
+                        <button
+                          disabled={actingOn === b._id}
+                          onClick={() => act(b._id, 'active')}
+                          className="bg-primary-container text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
+                        >
+                          Start Trip
+                        </button>
+                      )}
+                      {b.status === 'active' && (
+                        <button
+                          disabled={actingOn === b._id}
+                          onClick={() => act(b._id, 'completed')}
+                          className="bg-tertiary text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-colors disabled:opacity-50"
+                        >
+                          Complete Trip
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
