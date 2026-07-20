@@ -30,6 +30,8 @@ export interface IVehicle extends Document {
   description: string;
   specs: ISpec[];
   location: string;
+  latitude?: number;
+  longitude?: number;
   host?: IHost;
   owner?: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -72,6 +74,8 @@ const vehicleSchema = new Schema<IVehicle>(
     description: { type: String, default: '' },
     specs: { type: [specSchema], default: [] },
     location: { type: String, default: 'Kathmandu' },
+    latitude: { type: Number },
+    longitude: { type: Number },
     host: { type: hostSchema, default: undefined },
     owner: { type: Schema.Types.ObjectId, ref: 'User' },
   },

@@ -7,6 +7,8 @@ import Footer from '@/components/layout/Footer';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import RequireRole from '@/components/auth/RequireRole';
+import ImageUploader from '@/components/vehicle/ImageUploader';
+import LocationPicker, { type PickedLocation } from '@/components/map/LocationPicker';
 import { useAppSelector } from '@/store/hooks';
 import { vehicleApi } from '@/api/vehicle.api';
 import type { NormalizedError } from '@/lib/axios';
@@ -14,7 +16,6 @@ import type { VehicleType } from '@/types/vehicle';
 
 const TYPES: VehicleType[] = ['Bike', 'Car', 'SUV', 'Van', 'Truck'];
 const STEPS = ['Photos', 'Documents', 'Details', 'Location', 'Review'];
-const PHOTO_SLOTS = ['Front', 'Back', 'Interior', 'Dashboard', 'Odometer'];
 
 export default function AddVehiclePage() {
   const router = useRouter();
@@ -27,10 +28,10 @@ export default function AddVehiclePage() {
     seats: '',
     transmission: '',
     fuelType: '',
-    location: '',
-    imageUrl: '',
     description: '',
   });
+  const [images, setImages] = useState<string[]>([]);
+  const [location, setLocation] = useState<PickedLocation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,8 +60,10 @@ export default function AddVehiclePage() {
         seats: form.seats || undefined,
         transmission: form.transmission || undefined,
         fuelType: form.fuelType || undefined,
-        location: form.location || undefined,
-        imageUrl: form.imageUrl || undefined,
+        location: location?.address || undefined,
+        latitude: location?.latitude,
+        longitude: location?.longitude,
+        images,
         description: form.description || undefined,
       });
       router.push(`/vehicles/${v._id}`);
@@ -103,22 +106,9 @@ export default function AddVehiclePage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-stack-lg">
-          {/* Photos (placeholder) */}
+          {/* Photos (real upload) */}
           <section className="bg-surface-container-lowest rounded-xl p-stack-lg shadow-sm border border-outline-variant">
-            <div className="flex items-center justify-between mb-stack-md">
-              <h2 className="font-headline-md text-headline-md">Photos</h2>
-              <span className="font-body-sm text-body-sm text-outline">upload UI — use Image URL below for the cover</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-stack-md">
-              {PHOTO_SLOTS.map((slot) => (
-                <div key={slot} className="flex flex-col items-center gap-2">
-                  <div className="w-full aspect-square bg-surface-container border-2 border-dashed border-outline rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-surface-container-high transition-colors">
-                    <span className="material-symbols-outlined text-on-surface-variant text-3xl">image</span>
-                    <span className="text-[10px] text-on-surface-variant font-medium mt-1">{slot}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ImageUploader images={images} onChange={setImages} />
           </section>
 
           {/* Details (real) */}
@@ -143,8 +133,6 @@ export default function AddVehiclePage() {
               <Input label="Seats" id="seats" placeholder="5" value={form.seats} onChange={set('seats')} />
               <Input label="Transmission" id="transmission" placeholder="Automatic / Manual" value={form.transmission} onChange={set('transmission')} />
               <Input label="Fuel Type" id="fuelType" placeholder="Petrol / Diesel" value={form.fuelType} onChange={set('fuelType')} />
-              <Input label="Location" id="location" placeholder="Kathmandu" icon="location_on" value={form.location} onChange={set('location')} />
-              <Input label="Cover Image URL" id="imageUrl" placeholder="https://…" icon="image" value={form.imageUrl} onChange={set('imageUrl')} />
             </div>
             <div className="space-y-unit mt-stack-md">
               <label htmlFor="description" className="block font-label-md text-label-md text-on-surface mb-2">Description</label>
@@ -157,6 +145,12 @@ export default function AddVehiclePage() {
                 className={inputCls}
               />
             </div>
+          </section>
+
+          {/* Location (map picker) */}
+          <section className="bg-surface-container-lowest rounded-xl p-stack-lg shadow-sm border border-outline-variant">
+            <h2 className="font-headline-md text-headline-md mb-stack-md">Pickup Location</h2>
+            <LocationPicker value={location} onChange={setLocation} />
           </section>
 
           <div className="flex justify-end gap-3">

@@ -56,4 +56,9 @@ export const ENDPOINTS = {
     CREATE: '/api/issues',
   },
   CHECKLIST: (bookingId: string) => `/api/bookings/${bookingId}/checklist`,
+  UPLOADS: '/api/uploads',
+  GEOCODE: {
+    SEARCH: '/api/geocode/search',
+    REVERSE: '/api/geocode/reverse',
+  },
 } as const;

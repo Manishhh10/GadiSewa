@@ -31,6 +31,11 @@ export function errorHandler(
       .join(', ');
   }
 
+  // Multer upload errors (file too large, too many files, bad type from fileFilter)
+  if (err.name === 'MulterError' || message === 'Only JPEG, PNG and WEBP images are allowed') {
+    statusCode = 400;
+  }
+
   if (env_isDev()) console.error('💥', err);
 
   res.status(statusCode).json({ success: false, message });

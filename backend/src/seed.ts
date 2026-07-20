@@ -34,6 +34,8 @@ const vehicles = [
     verified: true,
     featured: true,
     location: 'Lazimpat, Kathmandu',
+    latitude: 27.7215,
+    longitude: 85.3238,
     description:
       'A rugged and reliable 7-seater SUV, perfect for both city drives and mountain expeditions across Nepal. Spacious, powerful and well-maintained with full service history.',
     specs: [
@@ -54,6 +56,8 @@ const vehicles = [
     verified: true,
     featured: true,
     location: 'Lakeside, Pokhara',
+    latitude: 28.2096,
+    longitude: 83.9564,
     description:
       'The iconic Royal Enfield Classic 350 — built for the open road and the thrill of the ride. Ideal for touring Pokhara and the surrounding hills.',
     specs: [
@@ -73,6 +77,8 @@ const vehicles = [
     verified: false,
     featured: true,
     location: 'Balaju, Kathmandu',
+    latitude: 27.7360,
+    longitude: 85.3007,
     description:
       'A spacious 12-seater commercial van suited for group travel, corporate transport and cargo. Comfortable seating with ample luggage space.',
     specs: [
@@ -92,6 +98,8 @@ const vehicles = [
     verified: true,
     featured: false,
     location: 'Jhamsikhel, Lalitpur',
+    latitude: 27.6748,
+    longitude: 85.3095,
     description:
       'A stylish and fuel-efficient compact SUV with automatic transmission. Smooth handling and a premium interior make it a favourite for city travel.',
     specs: [
@@ -112,6 +120,8 @@ const vehicles = [
     verified: true,
     featured: false,
     location: 'Bhaktapur Durbar Square',
+    latitude: 27.6722,
+    longitude: 85.4283,
     description:
       'A nimble and economical 150cc commuter bike, great for navigating busy streets and short daily trips around the valley.',
     specs: [
@@ -131,6 +141,8 @@ const vehicles = [
     verified: true,
     featured: false,
     location: 'Thamel, Kathmandu',
+    latitude: 27.7154,
+    longitude: 85.3123,
     description:
       'A premium 14-seater tourist van with reclining seats and AC — the standard choice for comfortable long-distance group travel in Nepal.',
     specs: [

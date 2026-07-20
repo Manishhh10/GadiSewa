@@ -11,6 +11,7 @@ import { fetchVehicleById } from '@/store/actions/vehicleActions';
 import { clearSelected } from '@/store/slices/vehicleSlice';
 import { useTranslation } from '@/lib/i18n/I18nContext';
 import { reviewApi } from '@/api/review.api';
+import LocationMap from '@/components/map/LocationMap';
 import type { Vehicle } from '@/types/vehicle';
 import type { Review } from '@/types/review';
 
@@ -151,10 +152,16 @@ export default function VehicleDetailsPage() {
                     {t('vehicleDetail.pickupLocationTitle')}
                   </h2>
                   <div className="rounded-xl overflow-hidden border border-outline-variant">
-                    <div className="w-full h-56 bg-surface-container-high flex items-center justify-center">
-                      <span className="material-symbols-outlined text-primary text-[48px]" style={FILLED}>
-                        location_on
-                      </span>
+                    <div className="w-full h-56 bg-surface-container-high">
+                      {v.latitude !== undefined && v.longitude !== undefined ? (
+                        <LocationMap latitude={v.latitude} longitude={v.longitude} />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="material-symbols-outlined text-primary text-[48px]" style={FILLED}>
+                            location_on
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="p-6 bg-surface-container-lowest flex flex-col sm:flex-row justify-between items-center gap-4">
                       <div className="flex gap-2">
@@ -169,7 +176,11 @@ export default function VehicleDetailsPage() {
                         </div>
                       </div>
                       <a
-                        href="https://maps.google.com"
+                        href={
+                          v.latitude !== undefined && v.longitude !== undefined
+                            ? `https://www.google.com/maps/dir/?api=1&destination=${v.latitude},${v.longitude}`
+                            : 'https://maps.google.com'
+                        }
                         target="_blank"
                         rel="noreferrer"
                         className="font-label-md text-label-md flex items-center gap-1 text-primary hover:underline"

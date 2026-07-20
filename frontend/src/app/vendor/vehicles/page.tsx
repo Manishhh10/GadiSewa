@@ -7,6 +7,8 @@ import Footer from '@/components/layout/Footer';
 import RequireRole from '@/components/auth/RequireRole';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import ImageUploader from '@/components/vehicle/ImageUploader';
+import LocationPicker, { type PickedLocation } from '@/components/map/LocationPicker';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { deleteVehicle, fetchMyVehicles, updateVehicle } from '@/store/actions/vehicleActions';
 import { rs } from '@/lib/format';
@@ -126,10 +128,14 @@ function EditVehicleCard({ vehicle, onDone }: { vehicle: Vehicle; onDone: () => 
     name: vehicle.name,
     type: vehicle.type,
     dailyRate: String(vehicle.dailyRate),
-    location: vehicle.location || '',
-    imageUrl: vehicle.imageUrl,
     description: vehicle.description,
   });
+  const [images, setImages] = useState<string[]>(vehicle.images || []);
+  const [location, setLocation] = useState<PickedLocation | null>(
+    vehicle.latitude !== undefined && vehicle.longitude !== undefined
+      ? { address: vehicle.location || '', latitude: vehicle.latitude, longitude: vehicle.longitude }
+      : null
+  );
   const [saving, setSaving] = useState(false);
 
   const set =
@@ -146,8 +152,10 @@ function EditVehicleCard({ vehicle, onDone }: { vehicle: Vehicle; onDone: () => 
           name: form.name,
           type: form.type as VehicleType,
           dailyRate: Number(form.dailyRate),
-          location: form.location,
-          imageUrl: form.imageUrl,
+          location: location?.address,
+          latitude: location?.latitude,
+          longitude: location?.longitude,
+          images,
           description: form.description,
         },
       })
@@ -157,23 +165,37 @@ function EditVehicleCard({ vehicle, onDone }: { vehicle: Vehicle; onDone: () => 
   };
 
   return (
-    <div className="bg-surface-container-low rounded-xl border border-primary p-stack-md space-y-3">
-      <Input label="Name" value={form.name} onChange={set('name')} />
-      <div className="space-y-unit">
-        <label className="block font-label-md text-label-md text-on-surface mb-1">Type</label>
-        <select
-          value={form.type}
-          onChange={set('type')}
-          className="w-full px-4 py-3 rounded-lg border border-outline-variant/40 bg-surface-container-low font-body-md text-body-md"
-        >
-          {TYPES.map((ty) => (
-            <option key={ty} value={ty}>{ty}</option>
-          ))}
-        </select>
+    <div className="md:col-span-2 lg:col-span-3 bg-surface-container-low rounded-xl border border-primary p-stack-md space-y-stack-md">
+      <ImageUploader images={images} onChange={setImages} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+        <Input label="Name" value={form.name} onChange={set('name')} />
+        <div className="space-y-unit">
+          <label className="block font-label-md text-label-md text-on-surface mb-1">Type</label>
+          <select
+            value={form.type}
+            onChange={set('type')}
+            className="w-full px-4 py-3 rounded-lg border border-outline-variant/40 bg-surface-container-low font-body-md text-body-md"
+          >
+            {TYPES.map((ty) => (
+              <option key={ty} value={ty}>{ty}</option>
+            ))}
+          </select>
+        </div>
+        <Input label="Daily Rate (NPR)" type="number" value={form.dailyRate} onChange={set('dailyRate')} />
       </div>
-      <Input label="Daily Rate (NPR)" type="number" value={form.dailyRate} onChange={set('dailyRate')} />
-      <Input label="Location" value={form.location} onChange={set('location')} />
-      <Input label="Cover Image URL" value={form.imageUrl} onChange={set('imageUrl')} />
+      <div className="space-y-unit">
+        <label className="block font-label-md text-label-md text-on-surface mb-2">Description</label>
+        <textarea
+          rows={3}
+          value={form.description}
+          onChange={set('description')}
+          className="w-full px-4 py-3 rounded-lg border border-outline-variant/40 bg-surface-container-low font-body-md text-body-md"
+        />
+      </div>
+      <div>
+        <label className="block font-label-md text-label-md text-on-surface mb-2">Location</label>
+        <LocationPicker value={location} onChange={setLocation} />
+      </div>
       <div className="flex gap-2 pt-2">
         <Button onClick={onSave} loading={saving} className="flex-1">Save</Button>
         <Button variant="ghost" onClick={onDone} className="flex-1" type="button">Cancel</Button>

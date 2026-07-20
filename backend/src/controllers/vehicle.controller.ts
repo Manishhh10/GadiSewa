@@ -86,7 +86,9 @@ export async function createVehicle(req: Request, res: Response, next: NextFunct
       dailyRate,
       description,
       location,
-      imageUrl,
+      images,
+      latitude,
+      longitude,
       seats,
       transmission,
       fuelType,
@@ -101,13 +103,18 @@ export async function createVehicle(req: Request, res: Response, next: NextFunct
     if (seats) specs.push({ icon: 'group', label: `${seats} Seats` });
     if (fuelType) specs.push({ icon: 'local_gas_station', label: String(fuelType) });
 
+    const imageList: string[] = Array.isArray(images) ? images.filter(Boolean) : [];
+
     const vehicle = await Vehicle.create({
       name,
       type,
       dailyRate: Number(dailyRate),
       description: description || '',
       location: location || 'Kathmandu',
-      imageUrl: imageUrl || '',
+      latitude: latitude !== undefined ? Number(latitude) : undefined,
+      longitude: longitude !== undefined ? Number(longitude) : undefined,
+      images: imageList,
+      imageUrl: imageList[0] || '',
       specs,
       owner: req.userId,
       verified: false,
@@ -141,7 +148,9 @@ export async function updateVehicle(req: Request, res: Response, next: NextFunct
       dailyRate,
       description,
       location,
-      imageUrl,
+      images,
+      latitude,
+      longitude,
       seats,
       transmission,
       fuelType,
@@ -152,7 +161,13 @@ export async function updateVehicle(req: Request, res: Response, next: NextFunct
     if (dailyRate !== undefined) vehicle.dailyRate = Number(dailyRate);
     if (description !== undefined) vehicle.description = description;
     if (location !== undefined) vehicle.location = location;
-    if (imageUrl !== undefined) vehicle.imageUrl = imageUrl;
+    if (latitude !== undefined) vehicle.latitude = Number(latitude);
+    if (longitude !== undefined) vehicle.longitude = Number(longitude);
+    if (Array.isArray(images)) {
+      const imageList = images.filter(Boolean);
+      vehicle.images = imageList;
+      vehicle.imageUrl = imageList[0] || '';
+    }
 
     if (seats !== undefined || transmission !== undefined || fuelType !== undefined) {
       const specs: { icon: string; label: string }[] = [];

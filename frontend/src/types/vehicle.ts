@@ -29,6 +29,8 @@ export interface Vehicle {
   description: string;
   specs: VehicleSpec[];
   location?: string;
+  latitude?: number;
+  longitude?: number;
   host?: Host;
   /** A plain user id in most contexts; populated with contact info on a booking's vehicle. */
   owner?: string | { _id: string; fullName?: string; phone?: string; email?: string };
@@ -51,7 +53,9 @@ export interface CreateVehiclePayload {
   dailyRate: number;
   description?: string;
   location?: string;
-  imageUrl?: string;
+  latitude?: number;
+  longitude?: number;
+  images?: string[];
   seats?: string;
   transmission?: string;
   fuelType?: string;
