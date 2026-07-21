@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { uploadImages } from '../controllers/upload.controller';
 import { upload } from '../middlewares/upload.middleware';
-import { protect, requireRole } from '../middlewares/auth.middleware';
+import { protect } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.post('/', protect, requireRole('vendor', 'admin'), upload.array('images', 5), uploadImages);
+// Any authenticated user can upload — renters need this to attach a vendor
+// application's government ID before they hold the vendor role.
+router.post('/', protect, upload.array('images', 5), uploadImages);
 
 export default router;
