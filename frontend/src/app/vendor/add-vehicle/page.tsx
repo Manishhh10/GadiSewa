@@ -87,25 +87,6 @@ export default function AddVehiclePage() {
           </p>
         </div>
 
-        {/* Section checklist — reflects real completion, not a fake multi-page wizard */}
-        <div className="flex flex-wrap items-center gap-3 mb-stack-lg">
-          {[
-            { label: 'Photos', done: images.length > 0 },
-            { label: 'Details', done: !!form.name && !!form.dailyRate },
-            { label: 'Location', done: !!location },
-          ].map((s) => (
-            <div
-              key={s.label}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-md text-label-md ${
-                s.done ? 'bg-tertiary-container/20 text-tertiary' : 'border border-outline-variant text-on-surface-variant'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[16px]">{s.done ? 'check_circle' : 'radio_button_unchecked'}</span>
-              {s.label}
-            </div>
-          ))}
-        </div>
-
         <form onSubmit={onSubmit} className="space-y-stack-lg">
           {/* Photos (real upload) */}
           <section className="bg-surface-container-lowest rounded-xl p-stack-lg shadow-sm border border-outline-variant">
