@@ -90,16 +90,20 @@ export async function getVendorBookings(req: Request, res: Response, next: NextF
 /** GET /api/bookings/:id  (protected — renter who booked it, the vehicle's owner, or an admin) */
 export async function getBookingById(req: Request, res: Response, next: NextFunction) {
   try {
-    const booking = await Booking.findById(req.params.id).populate({
-      path: 'vehicle',
-      populate: { path: 'owner', select: 'fullName phone email' },
-    });
+    const booking = await Booking.findById(req.params.id)
+      .populate({
+        path: 'vehicle',
+        populate: { path: 'owner', select: 'fullName phone email' },
+      })
+      .populate('user', 'fullName username email phone');
     if (!booking) throw new AppError('Booking not found', 404);
 
     const vehicle = booking.vehicle as unknown as { owner?: { _id?: unknown } | string };
     const ownerId =
       vehicle?.owner && typeof vehicle.owner === 'object' ? vehicle.owner._id : vehicle?.owner;
-    const isRenter = booking.user.toString() === req.userId;
+    const renter = booking.user as unknown as { _id?: unknown } | string;
+    const renterId = renter && typeof renter === 'object' ? renter._id : renter;
+    const isRenter = !!renterId && String(renterId) === req.userId;
     const isOwner = ownerId && String(ownerId) === req.userId;
     const isAdmin = req.userRole === 'admin';
     if (!isRenter && !isOwner && !isAdmin) {

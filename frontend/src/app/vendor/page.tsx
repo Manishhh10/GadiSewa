@@ -142,6 +142,12 @@ export default function VendorDashboardPage() {
                       </div>
                     </div>
                     <div className="flex gap-2">
+                      <Link
+                        href={`/vendor/bookings/${b._id}`}
+                        className="border border-outline-variant text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors"
+                      >
+                        Details
+                      </Link>
                       {b.status === 'pending' && (
                         <>
                           <button
