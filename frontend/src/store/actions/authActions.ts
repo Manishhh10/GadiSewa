@@ -3,8 +3,10 @@ import { authApi } from '@/api/auth.api';
 import { TOKEN_KEY, type NormalizedError } from '@/lib/axios';
 import type {
   AuthResponse,
+  ChangePasswordPayload,
   LoginPayload,
   RegisterPayload,
+  UpdateProfilePayload,
   User,
 } from '@/types/auth';
 
@@ -55,3 +57,27 @@ export const fetchMe = createAsyncThunk<User, void, { rejectValue: string }>(
     }
   }
 );
+
+export const updateProfile = createAsyncThunk<
+  User,
+  UpdateProfilePayload,
+  { rejectValue: string }
+>('auth/updateProfile', async (payload, { rejectWithValue }) => {
+  try {
+    return await authApi.updateProfile(payload);
+  } catch (err) {
+    return rejectWithValue((err as NormalizedError).message);
+  }
+});
+
+export const changePassword = createAsyncThunk<
+  string,
+  ChangePasswordPayload,
+  { rejectValue: string }
+>('auth/changePassword', async (payload, { rejectWithValue }) => {
+  try {
+    return await authApi.changePassword(payload);
+  } catch (err) {
+    return rejectWithValue((err as NormalizedError).message);
+  }
+});

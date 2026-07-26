@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { fetchMe, loginUser, registerUser } from '../actions/authActions';
+import { fetchMe, loginUser, registerUser, updateProfile } from '../actions/authActions';
 import { TOKEN_KEY } from '@/lib/axios';
 import type { AuthResponse, User } from '@/types/auth';
 
@@ -69,6 +69,9 @@ const authSlice = createSlice({
       .addCase(fetchMe.rejected, (state) => {
         state.user = null;
         state.initialized = true;
+      })
+      .addCase(updateProfile.fulfilled, (state, action: PayloadAction<User>) => {
+        state.user = action.payload;
       });
   },
 });

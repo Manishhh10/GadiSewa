@@ -17,6 +17,11 @@ const ne: Dictionary = {
     login: 'लगइन/साइन अप',
     logout: 'लगआउट',
     changeLanguage: 'भाषा परिवर्तन गर्नुहोस्',
+    profile: 'प्रोफाइल',
+    renterDashboard: 'सवारीसाधन हेर्नुहोस्',
+    vendorDashboard: 'बिक्रेता ड्यासबोर्ड',
+    becomeVendor: 'बिक्रेता बन्नुहोस्',
+    myAccount: 'मेरो खाता',
   },
   footer: {
     tagline: 'नेपालमा यातायात सुरक्षित गर्ने सबैभन्दा छिटो र भरपर्दो तरिका।',

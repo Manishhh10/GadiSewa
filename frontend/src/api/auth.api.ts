@@ -3,8 +3,10 @@ import { ENDPOINTS } from '@/constants/endpoints';
 import type {
   ApiResponse,
   AuthResponse,
+  ChangePasswordPayload,
   LoginPayload,
   RegisterPayload,
+  UpdateProfilePayload,
   User,
 } from '@/types/auth';
 
@@ -33,6 +35,19 @@ export const authApi = {
   me: async (): Promise<User> => {
     const { data } = await http.get<ApiResponse<{ user: User }>>(ENDPOINTS.AUTH.ME);
     return data.data.user;
+  },
+
+  updateProfile: async (payload: UpdateProfilePayload): Promise<User> => {
+    const { data } = await http.patch<ApiResponse<{ user: User }>>(
+      ENDPOINTS.AUTH.UPDATE_ME,
+      payload
+    );
+    return data.data.user;
+  },
+
+  changePassword: async (payload: ChangePasswordPayload): Promise<string> => {
+    const { data } = await http.patch<ApiResponse<null>>(ENDPOINTS.AUTH.CHANGE_PASSWORD, payload);
+    return data.message;
   },
 
   forgotPassword: async (email: string): Promise<string> => {

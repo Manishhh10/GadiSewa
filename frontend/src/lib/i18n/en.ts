@@ -15,6 +15,11 @@ const en = {
     login: 'Login/Sign Up',
     logout: 'Logout',
     changeLanguage: 'Change language',
+    profile: 'Profile',
+    renterDashboard: 'Browse Vehicles',
+    vendorDashboard: 'Vendor Dashboard',
+    becomeVendor: 'Become a Vendor',
+    myAccount: 'My Account',
   },
   footer: {
     tagline: 'The fastest and most reliable way to secure transport in Nepal.',

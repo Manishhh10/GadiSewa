@@ -53,6 +53,8 @@ export async function register(req: Request, res: Response, next: NextFunction) 
           email: user.email,
           username: user.username,
           fullName: user.fullName,
+          phone: user.phone,
+          avatarUrl: user.avatarUrl,
           role: user.role,
         },
       },
@@ -91,6 +93,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
           email: user.email,
           username: user.username,
           fullName: user.fullName,
+          phone: user.phone,
+          avatarUrl: user.avatarUrl,
           role: user.role,
         },
       },
@@ -118,11 +122,79 @@ export async function me(req: Request, res: Response, next: NextFunction) {
           email: user.email,
           username: user.username,
           fullName: user.fullName,
+          phone: user.phone,
+          avatarUrl: user.avatarUrl,
           role: user.role,
           emailVerified: user.emailVerified,
         },
       },
     });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * PATCH /api/auth/me  (protected)
+ * Body: { fullName?, phone?, avatarUrl? } — the fields a user may edit about themselves.
+ */
+export async function updateMe(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { fullName, phone, avatarUrl } = req.body;
+    const user = await User.findById(req.userId);
+    if (!user) throw new AppError('User not found', 404);
+
+    if (fullName !== undefined) user.fullName = String(fullName).trim();
+    if (phone !== undefined) user.phone = String(phone).trim();
+    if (avatarUrl !== undefined) user.avatarUrl = String(avatarUrl);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated',
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          fullName: user.fullName,
+          phone: user.phone,
+          avatarUrl: user.avatarUrl,
+          role: user.role,
+          emailVerified: user.emailVerified,
+        },
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * PATCH /api/auth/change-password  (protected)
+ * Body: { currentPassword, newPassword }
+ */
+export async function changePassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      throw new AppError('Current and new password are required', 400);
+    }
+    if (String(newPassword).length < 6) {
+      throw new AppError('New password must be at least 6 characters', 400);
+    }
+
+    const user = await User.findById(req.userId).select('+password');
+    if (!user) throw new AppError('User not found', 404);
+
+    if (!(await user.comparePassword(currentPassword))) {
+      throw new AppError('Current password is incorrect', 401);
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ success: true, message: 'Password changed.' });
   } catch (err) {
     next(err);
   }

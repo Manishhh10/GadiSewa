@@ -49,7 +49,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
           </div>
         </div>
 
-        <div className="flex gap-4 mb-4 text-secondary text-sm">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 mb-4 text-secondary text-sm">
           {vehicle.specs.map((s) => (
             <span key={s.label} className="flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px]">{s.icon}</span>
