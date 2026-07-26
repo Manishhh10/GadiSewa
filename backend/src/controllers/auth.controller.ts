@@ -136,17 +136,43 @@ export async function me(req: Request, res: Response, next: NextFunction) {
 
 /**
  * PATCH /api/auth/me  (protected)
- * Body: { fullName?, phone?, avatarUrl? } — the fields a user may edit about themselves.
+ * Body: { fullName?, phone?, avatarUrl?, email?, username? } — the fields a user may edit about themselves.
  */
 export async function updateMe(req: Request, res: Response, next: NextFunction) {
   try {
-    const { fullName, phone, avatarUrl } = req.body;
+    const { fullName, phone, avatarUrl, email, username } = req.body;
     const user = await User.findById(req.userId);
     if (!user) throw new AppError('User not found', 404);
 
     if (fullName !== undefined) user.fullName = String(fullName).trim();
     if (phone !== undefined) user.phone = String(phone).trim();
     if (avatarUrl !== undefined) user.avatarUrl = String(avatarUrl);
+
+    if (email !== undefined) {
+      const nextEmail = String(email).trim().toLowerCase();
+      if (!/^\S+@\S+\.\S+$/.test(nextEmail)) {
+        throw new AppError('Please provide a valid email', 400);
+      }
+      if (nextEmail !== user.email) {
+        const taken = await User.findOne({ email: nextEmail, _id: { $ne: user._id } });
+        if (taken) throw new AppError('That email is already in use', 409);
+        user.email = nextEmail;
+        user.emailVerified = false;
+      }
+    }
+
+    if (username !== undefined) {
+      const nextUsername = String(username).trim();
+      if (nextUsername.length < 3) {
+        throw new AppError('Username must be at least 3 characters', 400);
+      }
+      if (nextUsername !== user.username) {
+        const taken = await User.findOne({ username: nextUsername, _id: { $ne: user._id } });
+        if (taken) throw new AppError('That username is already taken', 409);
+        user.username = nextUsername;
+      }
+    }
+
     await user.save();
 
     res.json({

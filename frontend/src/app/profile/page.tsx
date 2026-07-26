@@ -32,7 +32,12 @@ function ProfileContent() {
   const toast = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [form, setForm] = useState({ fullName: user?.fullName ?? '', phone: user?.phone ?? '' });
+  const [form, setForm] = useState({
+    fullName: user?.fullName ?? '',
+    phone: user?.phone ?? '',
+    email: user?.email ?? '',
+    username: user?.username ?? '',
+  });
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl ?? '');
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -60,12 +65,21 @@ function ProfileContent() {
   const onSaveProfile = async (e: FormEvent) => {
     e.preventDefault();
     setSavingProfile(true);
+    const emailChanged = form.email.trim().toLowerCase() !== user.email.toLowerCase();
     const result = await dispatch(
-      updateProfile({ fullName: form.fullName, phone: form.phone, avatarUrl })
+      updateProfile({
+        fullName: form.fullName,
+        phone: form.phone,
+        avatarUrl,
+        email: form.email,
+        username: form.username,
+      })
     );
     setSavingProfile(false);
     if (updateProfile.fulfilled.match(result)) {
-      toast.success('Profile updated.');
+      toast.success(
+        emailChanged ? 'Profile updated — please re-verify your new email.' : 'Profile updated.'
+      );
     } else {
       toast.error(result.payload ?? 'Could not save your profile.');
     }
@@ -150,9 +164,27 @@ function ProfileContent() {
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
-              <Input label="Email" value={user.email} disabled />
-              <Input label="Username" value={user.username} disabled />
+              <Input
+                label="Email"
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
+              <Input
+                label="Username"
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                required
+                minLength={3}
+              />
             </div>
+            {form.email.trim().toLowerCase() !== user.email.toLowerCase() && (
+              <p className="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">info</span>
+                Changing your email will require re-verifying it.
+              </p>
+            )}
             <Button type="submit" loading={savingProfile} className="md:w-auto md:px-8">
               Save Changes
             </Button>
