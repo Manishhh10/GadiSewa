@@ -20,7 +20,8 @@ export interface Booking {
   _id: string;
   /** A plain user id on the renter's own bookings; populated with contact info on vendor bookings. */
   user: string | BookingRenter;
-  vehicle: Vehicle; // populated by the backend
+  /** Populated by the backend — null if the listing was since deleted by its owner. */
+  vehicle: Vehicle | null;
   pickupDate: string;
   returnDate: string;
   days: number;

@@ -135,8 +135,14 @@ function BookingCard({ booking: b }: { booking: Booking }) {
   return (
     <div className="bg-surface-container-low rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden border border-transparent hover:border-primary/20 transition-all flex flex-col">
       <div className="relative h-48 w-full bg-surface-dim">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
+        {b.vehicle ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-outline">
+            <span className="material-symbols-outlined text-4xl">directions_car</span>
+          </div>
+        )}
         <div
           className={`absolute top-4 right-4 px-3 py-1 rounded-full flex items-center gap-1 backdrop-blur-md font-label-md text-xs capitalize ${statusStyle[b.status]}`}
         >
@@ -148,7 +154,9 @@ function BookingCard({ booking: b }: { booking: Booking }) {
       </div>
       <div className="p-stack-md flex-grow flex flex-col">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="font-headline-md text-headline-md">{b.vehicle.name}</h3>
+          <h3 className="font-headline-md text-headline-md">
+            {b.vehicle?.name ?? <span className="text-on-surface-variant italic">Listing removed</span>}
+          </h3>
           <span className="font-headline-sm text-headline-sm text-primary">{rs(b.totalAmount)}</span>
         </div>
         <p className="text-xs text-on-surface-variant mb-3">{t('bookings.ref')} {b.bookingRef}</p>

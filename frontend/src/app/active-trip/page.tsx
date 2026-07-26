@@ -21,7 +21,7 @@ export default function ActiveTripPage() {
   const trip =
     items.find((b) => b.status === 'active' || b.status === 'confirmed') ?? null;
 
-  const owner = trip && typeof trip.vehicle.owner === 'object' ? trip.vehicle.owner : null;
+  const owner = trip?.vehicle && typeof trip.vehicle.owner === 'object' ? trip.vehicle.owner : null;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -51,14 +51,22 @@ export default function ActiveTripPage() {
               {/* Left */}
               <div className="md:col-span-7 space-y-stack-lg">
                 <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant flex flex-col sm:flex-row gap-6">
-                  <div className="w-full sm:w-40 h-32 rounded-xl overflow-hidden bg-surface-variant shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={trip.vehicle.imageUrl} alt={trip.vehicle.name} className="w-full h-full object-cover" />
+                  <div className="w-full sm:w-40 h-32 rounded-xl overflow-hidden bg-surface-variant shrink-0 flex items-center justify-center">
+                    {trip.vehicle ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={trip.vehicle.imageUrl} alt={trip.vehicle.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-3xl text-outline">directions_car</span>
+                    )}
                   </div>
                   <div className="flex flex-col justify-center">
-                    <h2 className="font-headline-md text-headline-md mb-1">{trip.vehicle.name}</h2>
+                    <h2 className="font-headline-md text-headline-md mb-1">
+                      {trip.vehicle?.name ?? <span className="italic text-on-surface-variant">Listing removed</span>}
+                    </h2>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-on-surface-variant text-sm">
-                      <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">directions_car</span> {trip.vehicle.type}</span>
+                      {trip.vehicle && (
+                        <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">directions_car</span> {trip.vehicle.type}</span>
+                      )}
                       <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">tag</span> {trip.bookingRef}</span>
                     </div>
                     <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider w-fit">{trip.status}</span>
@@ -92,11 +100,11 @@ export default function ActiveTripPage() {
 
               {/* Right */}
               <div className="md:col-span-5 space-y-stack-lg">
-                {(trip.vehicle.host || owner) && (
+                {(trip.vehicle?.host || owner) && (
                   <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant">
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-12 h-12 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center">
-                        {trip.vehicle.host?.avatarUrl ? (
+                        {trip.vehicle?.host?.avatarUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={trip.vehicle.host.avatarUrl} alt={trip.vehicle.host.name} className="w-full h-full object-cover" />
                         ) : (
@@ -106,9 +114,9 @@ export default function ActiveTripPage() {
                       <div>
                         <div className="flex items-center gap-1">
                           <h3 className="font-bold text-on-surface">
-                            {trip.vehicle.host?.name || owner?.fullName || 'Vendor'}
+                            {trip.vehicle?.host?.name || owner?.fullName || 'Vendor'}
                           </h3>
-                          {trip.vehicle.host?.verified && (
+                          {trip.vehicle?.host?.verified && (
                             <span className="material-symbols-outlined text-primary text-sm" style={FILLED}>verified</span>
                           )}
                         </div>

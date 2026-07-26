@@ -134,7 +134,7 @@ export default function VendorDashboardPage() {
                       </div>
                       <div>
                         <div className="font-label-md text-label-md text-on-surface">
-                          {b.vehicle.name} <span className="text-on-surface-variant">({renterName})</span>
+                          {b.vehicle?.name ?? 'Listing removed'} <span className="text-on-surface-variant">({renterName})</span>
                         </div>
                         <div className="font-body-sm text-body-sm text-on-surface-variant">
                           {fmtDate(b.pickupDate)} – {fmtDate(b.returnDate)} • {rs(b.totalAmount)} • <span className="capitalize">{b.status}</span>

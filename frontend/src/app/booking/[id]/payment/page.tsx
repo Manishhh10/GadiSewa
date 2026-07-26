@@ -140,15 +140,23 @@ function PaymentPageContent() {
             {/* Order summary */}
             <aside className="lg:col-span-5 sticky top-24">
               <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
-                <div className="relative h-48 w-full bg-surface-container">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
-                  <div className="absolute top-4 right-4 bg-on-surface/80 backdrop-blur-md text-surface px-3 py-1 rounded-full font-label-md text-label-md">
-                    {b.vehicle.type}
-                  </div>
+                <div className="relative h-48 w-full bg-surface-container flex items-center justify-center">
+                  {b.vehicle ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
+                      <div className="absolute top-4 right-4 bg-on-surface/80 backdrop-blur-md text-surface px-3 py-1 rounded-full font-label-md text-label-md">
+                        {b.vehicle.type}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="material-symbols-outlined text-4xl text-outline">directions_car</span>
+                  )}
                 </div>
                 <div className="p-6 space-y-4">
-                  <h2 className="font-headline-md text-headline-md">{b.vehicle.name}</h2>
+                  <h2 className="font-headline-md text-headline-md">
+                    {b.vehicle?.name ?? <span className="text-on-surface-variant italic">Listing removed</span>}
+                  </h2>
                   <SummaryRow icon="calendar_today" label={t('payment.rentalDates')} value={`${fmtDate(b.pickupDate)} — ${fmtDate(b.returnDate)}`} />
                   <SummaryRow icon="location_on" label={t('payment.pickupLocation')} value={b.pickupLocation} />
                   <SummaryRow icon="schedule" label={t('payment.duration')} value={`${b.days} ${t('payment.daysSuffix')}`} />

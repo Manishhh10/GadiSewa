@@ -62,16 +62,24 @@ export default function BookingSuccessPage() {
                     {t('success.tripSummary')}
                   </h2>
                   <div className="flex gap-4 items-start mb-8">
-                    <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
+                    <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container flex items-center justify-center">
+                      {b.vehicle ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="material-symbols-outlined text-3xl text-outline">directions_car</span>
+                      )}
                     </div>
                     <div>
-                      <p className="font-headline-md text-headline-md text-primary mb-1">{b.vehicle.name}</p>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        {b.vehicle.host ? `${t('success.vendor')} ${b.vehicle.host.name}` : b.vehicle.type}
+                      <p className="font-headline-md text-headline-md text-primary mb-1">
+                        {b.vehicle?.name ?? <span className="italic text-on-surface-variant">Listing removed</span>}
                       </p>
-                      {b.vehicle.verified && (
+                      {b.vehicle && (
+                        <p className="font-body-sm text-body-sm text-on-surface-variant">
+                          {b.vehicle.host ? `${t('success.vendor')} ${b.vehicle.host.name}` : b.vehicle.type}
+                        </p>
+                      )}
+                      {b.vehicle?.verified && (
                         <div className="mt-2 inline-flex items-center gap-1 bg-tertiary-container/15 text-tertiary px-2 py-0.5 rounded-full">
                           <span className="material-symbols-outlined text-[14px]" style={FILLED}>verified</span>
                           <span className="text-[12px] font-bold uppercase">{t('vehicleCard.verified')}</span>

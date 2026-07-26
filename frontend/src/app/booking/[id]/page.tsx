@@ -38,7 +38,7 @@ export default function BookingReviewPage() {
           <>
             <div className="mb-8">
               <Link
-                href={`/vehicles/${b.vehicle._id}`}
+                href={b.vehicle ? `/vehicles/${b.vehicle._id}` : '/bookings'}
                 className="flex items-center gap-1 text-primary mb-2 font-label-md text-label-md hover:underline w-fit"
               >
                 <span className="material-symbols-outlined text-[18px]">arrow_back</span>
@@ -55,33 +55,45 @@ export default function BookingReviewPage() {
               <div className="lg:col-span-2 space-y-8">
                 {/* Vehicle summary */}
                 <section className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col md:flex-row shadow-sm">
-                  <div className="w-full md:w-2/5 h-48 md:h-auto bg-surface-container">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
+                  <div className="w-full md:w-2/5 h-48 md:h-auto bg-surface-container flex items-center justify-center">
+                    {b.vehicle ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={b.vehicle.imageUrl} alt={b.vehicle.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-4xl text-outline">directions_car</span>
+                    )}
                   </div>
                   <div className="p-6 flex-grow space-y-4">
                     <div className="flex justify-between items-start">
-                      <div>
-                        <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md uppercase inline-block mb-1">
-                          {b.vehicle.type}
-                        </span>
-                        <h2 className="font-headline-md text-headline-md">{b.vehicle.name}</h2>
-                      </div>
-                      {b.vehicle.verified && (
+                      {b.vehicle ? (
+                        <div>
+                          <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md uppercase inline-block mb-1">
+                            {b.vehicle.type}
+                          </span>
+                          <h2 className="font-headline-md text-headline-md">{b.vehicle.name}</h2>
+                        </div>
+                      ) : (
+                        <h2 className="font-headline-md text-headline-md text-on-surface-variant italic">
+                          This vehicle listing is no longer available
+                        </h2>
+                      )}
+                      {b.vehicle?.verified && (
                         <div className="flex items-center text-tertiary gap-1">
                           <span className="material-symbols-outlined" style={FILLED}>verified</span>
                           <span className="font-label-md text-label-md">{t('vehicleCard.verified')}</span>
                         </div>
                       )}
                     </div>
-                    <div className="flex flex-wrap gap-4">
-                      {b.vehicle.specs.map((s) => (
-                        <div key={s.label} className="flex items-center gap-1 text-on-surface-variant">
-                          <span className="material-symbols-outlined text-[20px]">{s.icon}</span>
-                          <span className="font-body-sm text-body-sm">{s.label}</span>
-                        </div>
-                      ))}
-                    </div>
+                    {b.vehicle && (
+                      <div className="flex flex-wrap gap-4">
+                        {b.vehicle.specs.map((s) => (
+                          <div key={s.label} className="flex items-center gap-1 text-on-surface-variant">
+                            <span className="material-symbols-outlined text-[20px]">{s.icon}</span>
+                            <span className="font-body-sm text-body-sm">{s.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </section>
 
@@ -145,7 +157,14 @@ export default function BookingReviewPage() {
                   </div>
                 </div>
                 <div className="space-y-3 border-b border-outline-variant pb-4">
-                  <Row label={`${t('bookingReview.dailyRate')} (${rs(b.vehicle.dailyRate)} × ${b.days})`} value={rs(b.baseAmount)} />
+                  <Row
+                    label={
+                      b.vehicle
+                        ? `${t('bookingReview.dailyRate')} (${rs(b.vehicle.dailyRate)} × ${b.days})`
+                        : `${t('bookingReview.dailyRate')} × ${b.days}`
+                    }
+                    value={rs(b.baseAmount)}
+                  />
                   <Row label={t('bookingReview.serviceFee')} value={rs(b.serviceFee)} />
                   <Row label={t('bookingReview.cleaning')} value={rs(b.cleaningFee)} />
                   <div className="flex justify-between text-on-surface-variant font-body-md text-body-md">
