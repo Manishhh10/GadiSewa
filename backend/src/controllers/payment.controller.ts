@@ -9,10 +9,25 @@ import { bookingConfirmationEmail } from '../utils/emailTemplates';
 /** POST /api/bookings/:id/esewa/initiate  (protected) — start a real eSewa UAT payment */
 export async function initiateEsewaPayment(req: Request, res: Response, next: NextFunction) {
   try {
-    const booking = await Booking.findOne({ _id: req.params.id, user: req.userId });
+    const booking = await Booking.findOne({ _id: req.params.id, user: req.userId }).populate('vehicle');
     if (!booking) throw new AppError('Booking not found', 404);
     if (booking.paymentStatus === 'paid') {
       throw new AppError('Booking is already paid', 400);
+    }
+    if (booking.status === 'cancelled') {
+      throw new AppError('This booking was cancelled and can no longer be paid.', 400);
+    }
+    if (!booking.vehicle) {
+      throw new AppError(
+        'This vehicle listing is no longer available. Please cancel this booking.',
+        400
+      );
+    }
+    if (booking.returnDate.getTime() < Date.now()) {
+      throw new AppError(
+        'The rental dates for this booking have passed. Please cancel it.',
+        400
+      );
     }
 
     // Unique per attempt (not just per booking) so retrying after a failed/abandoned

@@ -1,14 +1,15 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchBookingById, initiateEsewaPayment } from '@/store/actions/bookingActions';
+import { cancelBooking, fetchBookingById, initiateEsewaPayment } from '@/store/actions/bookingActions';
 import { fmtDate, rs } from '@/lib/format';
 import { useTranslation } from '@/lib/i18n/I18nContext';
+import { useToast } from '@/lib/toast/ToastContext';
 
 const FILLED = { fontVariationSettings: "'FILL' 1" } as const;
 
@@ -41,9 +42,11 @@ function PaymentPageContent() {
   const id = String(params.id);
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const { t } = useTranslation();
   const { current: b, loading, saving, error } = useAppSelector((s) => s.bookings);
   const failed = searchParams.get('failed') === '1';
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     dispatch(fetchBookingById(id));
@@ -53,8 +56,26 @@ function PaymentPageContent() {
     const res = await dispatch(initiateEsewaPayment(id));
     if (initiateEsewaPayment.fulfilled.match(res)) {
       redirectToEsewa(res.payload.url, res.payload.fields);
+    } else {
+      toast.error(res.payload ?? 'Could not start payment.');
     }
   };
+
+  const onCancel = async () => {
+    if (!window.confirm('Cancel this booking?')) return;
+    setCancelling(true);
+    const res = await dispatch(cancelBooking(id));
+    setCancelling(false);
+    if (cancelBooking.fulfilled.match(res)) {
+      toast.success('Booking cancelled.');
+    } else {
+      toast.error(res.payload ?? 'Could not cancel this booking.');
+    }
+  };
+
+  const expired = !!b && new Date(b.returnDate).getTime() < Date.now();
+  const blocked = !!b && (!b.vehicle || expired);
+  const canCancel = !!b && (b.status === 'pending' || b.status === 'confirmed');
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -112,6 +133,24 @@ function PaymentPageContent() {
                     >
                       {t('payment.alreadyPaid')}
                     </Link>
+                  ) : blocked ? (
+                    <div className="w-full space-y-3 mt-2">
+                      <div className="bg-error-container text-on-error-container px-4 py-3 rounded-lg font-body-sm text-body-sm flex items-start gap-2">
+                        <span className="material-symbols-outlined text-[18px]">error</span>
+                        {!b.vehicle
+                          ? 'This vehicle listing is no longer available. This booking can no longer be paid.'
+                          : 'The rental dates for this booking have passed. This booking can no longer be paid.'}
+                      </div>
+                      {canCancel && (
+                        <button
+                          onClick={onCancel}
+                          disabled={cancelling}
+                          className="w-full border border-error text-error py-3 rounded-lg font-label-md text-label-md hover:bg-error/5 transition-all disabled:opacity-50"
+                        >
+                          Cancel Booking
+                        </button>
+                      )}
+                    </div>
                   ) : (
                     <button
                       onClick={onPay}
@@ -128,11 +167,13 @@ function PaymentPageContent() {
                       )}
                     </button>
                   )}
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[14px] align-middle">info</span>{' '}
-                    You&apos;ll be redirected to eSewa&apos;s test payment gateway — use test ID
-                    9711111111 / password Nepal@123 / MPIN 1122 to pay.
-                  </p>
+                  {!blocked && b.paymentStatus !== 'paid' && (
+                    <p className="font-body-sm text-body-sm text-on-surface-variant">
+                      <span className="material-symbols-outlined text-[14px] align-middle">info</span>{' '}
+                      You&apos;ll be redirected to eSewa&apos;s test payment gateway — use test ID
+                      9711111111 / password Nepal@123 / MPIN 1122 to pay.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
