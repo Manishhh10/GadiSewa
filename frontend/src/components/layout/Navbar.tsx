@@ -93,6 +93,15 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-stack-lg">{primaryLinks}</div>
 
         <div className="flex items-center gap-4">
+          <Link
+            href="/help"
+            title="Help Center"
+            aria-label="Help Center"
+            className="hidden sm:flex items-center text-on-surface-variant hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined">help</span>
+          </Link>
+
           <button
             type="button"
             onClick={toggleLocale}
@@ -184,6 +193,13 @@ export default function Navbar() {
       {mobileNavOpen && (
         <div className="md:hidden border-t border-outline-variant/60 px-margin-mobile py-4 flex flex-col gap-4 bg-surface">
           {primaryLinks}
+          <Link
+            href="/help"
+            className={NAV_LINKS_CLS}
+            onClick={() => setMobileNavOpen(false)}
+          >
+            Help Center
+          </Link>
           <button
             type="button"
             onClick={toggleLocale}

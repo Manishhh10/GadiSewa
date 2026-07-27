@@ -171,7 +171,10 @@ function PaymentPageContent() {
                     <p className="font-body-sm text-body-sm text-on-surface-variant">
                       <span className="material-symbols-outlined text-[14px] align-middle">info</span>{' '}
                       You&apos;ll be redirected to eSewa&apos;s test payment gateway — use test ID
-                      9711111111 / password Nepal@123 / MPIN 1122 to pay.
+                      9711111111 / password Nepal@123 / MPIN 1122 to pay.{' '}
+                      <Link href="/help#payment" className="text-primary hover:underline">
+                        Need help?
+                      </Link>
                     </p>
                   )}
                 </div>

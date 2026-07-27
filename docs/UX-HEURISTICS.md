@@ -137,14 +137,16 @@ real next step.
   or silently doing nothing.
 
 ### 10. Help and documentation
-**Honest gap:** there is no in-app help center, tooltip system, or FAQ.
-Field-level guidance exists only as placeholder text and the one-line
-descriptions under section headers (e.g. `app/damage-checklist/page.tsx`'s
-"protects both you and the vendor" banner). For an app this size that's a
-reasonable trade-off, but it's the weakest-covered heuristic here and would
-be the next thing to invest in if the app grows (e.g., a `/help` page and
-contextual tooltips on the eSewa payment step, which is the single most
-likely point of user confusion).
+`app/help/page.tsx` is a Help Center with an FAQ accordion covering booking,
+payment, cancellation, becoming a vendor, in-trip issues, language
+switching, profile editing, and reviews. It's reachable from a persistent
+help icon in `Navbar.tsx` (desktop and mobile, visible regardless of login
+state) and from the footer's "Contact Support" link
+(`Footer.tsx`). The eSewa payment step links directly to the relevant FAQ
+entry (`/help#payment`) rather than leaving the single most likely point of
+user confusion unaddressed. This was previously the one heuristic with no
+real implementation; it now has one, closing the last gap in this
+document.
 
 ---
 
@@ -258,3 +260,4 @@ one page that used to hold that state.
 | Honest section checklist instead of fake stepper | `vendor/add-vehicle/page.tsx` | Nielsen #8, Hick's Law |
 | Removed fabricated "98% response rate" stat | `vendor/page.tsx` | Nielsen #8 (honesty/minimalism) |
 | Pending-status Navbar badge + vendor dashboard banner | `components/layout/Navbar.tsx`, `vendor/page.tsx` | Nielsen #6, Zeigarnik Effect |
+| Help Center (FAQ) + navbar/footer links + payment-step link | `app/help/page.tsx`, `components/layout/Navbar.tsx`, `components/layout/Footer.tsx`, `booking/[id]/payment/page.tsx` | Nielsen #10 |
