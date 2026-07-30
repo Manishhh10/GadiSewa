@@ -3,3 +3,5 @@ Frontend update 2: frontend: sprint workflow update 2/40
 Frontend update 3: frontend: sprint workflow update 3/40
 Frontend update 4: frontend: sprint workflow update 4/40
 Frontend update 5: frontend: sprint workflow update 5/40
+Frontend update 6: frontend: sprint workflow update 6/40
+Frontend update 7: frontend: sprint workflow update 7/40
