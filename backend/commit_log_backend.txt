@@ -18,3 +18,5 @@ Backend update 4: backend: standardize app error responses in error middleware
 Backend update 5: backend: strengthen jwt verification and token expiry checks
 Backend update 6: backend: add role-based authorization guard for admin routes
 Backend update 7: backend: harden auth middleware against malformed bearer tokens
+Backend update 8: backend: improve login controller validation and failure messages
+Backend update 9: backend: add registration duplicate email and phone checks
