@@ -8,3 +8,4 @@ Frontend update 7: frontend: sprint workflow update 7/40
 Frontend update 8: frontend: sprint workflow update 8/40
 Frontend update 9: frontend: sprint workflow update 9/40
 Frontend update 10: frontend: sprint workflow update 10/40
+Frontend update 1: frontend: set up route guards for protected dashboard and vendor pages
