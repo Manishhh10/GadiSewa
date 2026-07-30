@@ -16,3 +16,5 @@ Backend update 2: backend: improve mongodb connection retry and timeout handling
 Backend update 3: backend: add centralized async controller error wrapper utility
 Backend update 4: backend: standardize app error responses in error middleware
 Backend update 5: backend: strengthen jwt verification and token expiry checks
+Backend update 6: backend: add role-based authorization guard for admin routes
+Backend update 7: backend: harden auth middleware against malformed bearer tokens
