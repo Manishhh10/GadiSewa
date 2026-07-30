@@ -22,3 +22,5 @@ Backend update 8: backend: improve login controller validation and failure messa
 Backend update 9: backend: add registration duplicate email and phone checks
 Backend update 10: backend: add vendor application duplicate request protection
 Backend update 11: backend: normalize booking creation payload and required fields
+Backend update 12: backend: add vehicle create validation for rental pricing rules
+Backend update 13: backend: improve stats controller aggregation for dashboard totals
