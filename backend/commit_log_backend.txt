@@ -20,3 +20,5 @@ Backend update 6: backend: add role-based authorization guard for admin routes
 Backend update 7: backend: harden auth middleware against malformed bearer tokens
 Backend update 8: backend: improve login controller validation and failure messages
 Backend update 9: backend: add registration duplicate email and phone checks
+Backend update 10: backend: add vendor application duplicate request protection
+Backend update 11: backend: normalize booking creation payload and required fields
