@@ -13,3 +13,5 @@ Frontend update 2: frontend: refactor navbar auth state handling for login and l
 Frontend update 3: frontend: add vehicle card price and availability badges on listing grid
 Frontend update 4: frontend: implement booking panel date range picker with disabled dates
 Frontend update 5: frontend: handle backend validation errors on register form submission
+Frontend update 6: frontend: add forgot-password and otp verification request states
+Frontend update 7: frontend: optimize homepage hero and featured vehicles for mobile layout
