@@ -11,3 +11,4 @@ Backend update 10: backend: sprint workflow update 10/52
 Backend update 11: backend: sprint workflow update 11/52
 Backend update 12: backend: sprint workflow update 12/52
 Backend update 13: backend: sprint workflow update 13/52
+Backend update 1: backend: refactor env validation and startup config loading

@@ -17,3 +17,4 @@ Frontend update 6: frontend: add forgot-password and otp verification request st
 Frontend update 7: frontend: optimize homepage hero and featured vehicles for mobile layout
 Frontend update 8: frontend: integrate vendor application api with form submission feedback
 Frontend update 9: frontend: create admin applications table with status filter controls
+Frontend update 10: frontend: add loading skeletons for dashboard stats and bookings list
