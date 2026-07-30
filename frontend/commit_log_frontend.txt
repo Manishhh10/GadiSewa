@@ -15,3 +15,5 @@ Frontend update 4: frontend: implement booking panel date range picker with disa
 Frontend update 5: frontend: handle backend validation errors on register form submission
 Frontend update 6: frontend: add forgot-password and otp verification request states
 Frontend update 7: frontend: optimize homepage hero and featured vehicles for mobile layout
+Frontend update 8: frontend: integrate vendor application api with form submission feedback
+Frontend update 9: frontend: create admin applications table with status filter controls
