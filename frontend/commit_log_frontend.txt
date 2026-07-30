@@ -9,3 +9,5 @@ Frontend update 8: frontend: sprint workflow update 8/40
 Frontend update 9: frontend: sprint workflow update 9/40
 Frontend update 10: frontend: sprint workflow update 10/40
 Frontend update 1: frontend: set up route guards for protected dashboard and vendor pages
+Frontend update 2: frontend: refactor navbar auth state handling for login and logout flows
+Frontend update 3: frontend: add vehicle card price and availability badges on listing grid
