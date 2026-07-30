@@ -14,3 +14,5 @@ Backend update 13: backend: sprint workflow update 13/52
 Backend update 1: backend: refactor env validation and startup config loading
 Backend update 2: backend: improve mongodb connection retry and timeout handling
 Backend update 3: backend: add centralized async controller error wrapper utility
+Backend update 4: backend: standardize app error responses in error middleware
+Backend update 5: backend: strengthen jwt verification and token expiry checks
