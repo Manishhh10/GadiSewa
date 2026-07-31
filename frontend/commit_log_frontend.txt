@@ -23,3 +23,5 @@ Frontend update 12: frontend: add empty state ui for user bookings and active tr
 Frontend update 13: frontend: improve vehicle details page with sticky booking summary panel
 Frontend update 14: frontend: add booking cancellation confirmation modal with reason input
 Frontend update 15: frontend: persist dashboard search filters using url query parameters
+Frontend update 16: frontend: fix hydration mismatch on conditional auth-only components
+Frontend update 17: frontend: improve accessibility labels and keyboard flow for auth forms
