@@ -18,3 +18,4 @@ Frontend update 7: frontend: optimize homepage hero and featured vehicles for mo
 Frontend update 8: frontend: integrate vendor application api with form submission feedback
 Frontend update 9: frontend: create admin applications table with status filter controls
 Frontend update 10: frontend: add loading skeletons for dashboard stats and bookings list
+Frontend update 11: frontend: implement toast notifications for booking create success and failure
