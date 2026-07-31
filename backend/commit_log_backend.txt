@@ -28,3 +28,5 @@ Backend update 14: backend: optimize booking list query with pagination paramete
 Backend update 15: backend: add booking date overlap check against existing bookings
 Backend update 16: backend: enforce booking status transition validation rules
 Backend update 17: backend: improve vehicle availability filter query performance
+Backend update 18: backend: add vendor ownership checks for vehicle update endpoints
+Backend update 19: backend: add admin endpoint guardrails for dangerous actions
