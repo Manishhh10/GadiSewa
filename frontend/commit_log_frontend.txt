@@ -21,3 +21,5 @@ Frontend update 10: frontend: add loading skeletons for dashboard stats and book
 Frontend update 11: frontend: implement toast notifications for booking create success and failure
 Frontend update 12: frontend: add empty state ui for user bookings and active trip screens
 Frontend update 13: frontend: improve vehicle details page with sticky booking summary panel
+Frontend update 14: frontend: add booking cancellation confirmation modal with reason input
+Frontend update 15: frontend: persist dashboard search filters using url query parameters
