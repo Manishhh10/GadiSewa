@@ -27,3 +27,4 @@ Frontend update 16: frontend: fix hydration mismatch on conditional auth-only co
 Frontend update 17: frontend: improve accessibility labels and keyboard flow for auth forms
 Frontend update 18: frontend: add reusable error banner component for api request failures
 Frontend update 19: frontend: implement optimistic ui update for booking status changes
+Frontend update 20: frontend: add pagination and sort controls to admin listings view
