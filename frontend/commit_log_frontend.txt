@@ -28,3 +28,4 @@ Frontend update 17: frontend: improve accessibility labels and keyboard flow for
 Frontend update 18: frontend: add reusable error banner component for api request failures
 Frontend update 19: frontend: implement optimistic ui update for booking status changes
 Frontend update 20: frontend: add pagination and sort controls to admin listings view
+Frontend update 21: frontend: standardize currency and date formatting across booking pages
