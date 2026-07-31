@@ -26,3 +26,5 @@ Backend update 12: backend: add vehicle create validation for rental pricing rul
 Backend update 13: backend: improve stats controller aggregation for dashboard totals
 Backend update 14: backend: optimize booking list query with pagination parameters
 Backend update 15: backend: add booking date overlap check against existing bookings
+Backend update 16: backend: enforce booking status transition validation rules
+Backend update 17: backend: improve vehicle availability filter query performance
