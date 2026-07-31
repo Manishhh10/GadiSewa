@@ -19,3 +19,5 @@ Frontend update 8: frontend: integrate vendor application api with form submissi
 Frontend update 9: frontend: create admin applications table with status filter controls
 Frontend update 10: frontend: add loading skeletons for dashboard stats and bookings list
 Frontend update 11: frontend: implement toast notifications for booking create success and failure
+Frontend update 12: frontend: add empty state ui for user bookings and active trip screens
+Frontend update 13: frontend: improve vehicle details page with sticky booking summary panel
