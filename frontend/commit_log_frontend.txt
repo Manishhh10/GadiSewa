@@ -25,3 +25,5 @@ Frontend update 14: frontend: add booking cancellation confirmation modal with r
 Frontend update 15: frontend: persist dashboard search filters using url query parameters
 Frontend update 16: frontend: fix hydration mismatch on conditional auth-only components
 Frontend update 17: frontend: improve accessibility labels and keyboard flow for auth forms
+Frontend update 18: frontend: add reusable error banner component for api request failures
+Frontend update 19: frontend: implement optimistic ui update for booking status changes
