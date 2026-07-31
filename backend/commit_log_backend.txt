@@ -34,3 +34,5 @@ Backend update 20: backend: improve dispute creation flow with structured reason
 Backend update 21: backend: add request id logging context to error responses
 Backend update 22: backend: sanitize user profile update payload fields
 Backend update 23: backend: prevent sensitive fields from leaking in user responses
+Backend update 24: backend: add schema indexes for booking and vehicle lookups
+Backend update 25: backend: improve seed script idempotency for local development
