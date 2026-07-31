@@ -32,3 +32,5 @@ Backend update 18: backend: add vendor ownership checks for vehicle update endpo
 Backend update 19: backend: add admin endpoint guardrails for dangerous actions
 Backend update 20: backend: improve dispute creation flow with structured reason codes
 Backend update 21: backend: add request id logging context to error responses
+Backend update 22: backend: sanitize user profile update payload fields
+Backend update 23: backend: prevent sensitive fields from leaking in user responses
