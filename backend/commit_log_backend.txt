@@ -2,3 +2,5 @@ Backend update 14: backend: sprint workflow update 14/52
 Backend update 15: backend: sprint workflow update 15/52
 Backend update 16: backend: sprint workflow update 16/52
 Backend update 17: backend: sprint workflow update 17/52
+Backend update 18: backend: sprint workflow update 18/52
+Backend update 19: backend: sprint workflow update 19/52
