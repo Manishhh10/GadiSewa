@@ -7,3 +7,4 @@ Frontend update 16: frontend: sprint workflow update 16/40
 Frontend update 17: frontend: sprint workflow update 17/40
 Frontend update 18: frontend: sprint workflow update 18/40
 Frontend update 19: frontend: sprint workflow update 19/40
+Frontend update 20: frontend: sprint workflow update 20/40
