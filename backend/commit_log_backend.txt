@@ -24,3 +24,16 @@ Backend update 10: backend: add vendor application duplicate request protection
 Backend update 11: backend: normalize booking creation payload and required fields
 Backend update 12: backend: add vehicle create validation for rental pricing rules
 Backend update 13: backend: improve stats controller aggregation for dashboard totals
+Backend update 14: backend: optimize booking list query with pagination parameters
+Backend update 15: backend: add booking date overlap check against existing bookings
+Backend update 16: backend: enforce booking status transition validation rules
+Backend update 17: backend: improve vehicle availability filter query performance
+Backend update 18: backend: add vendor ownership checks for vehicle update endpoints
+Backend update 19: backend: add admin endpoint guardrails for dangerous actions
+Backend update 20: backend: improve dispute creation flow with structured reason codes
+Backend update 21: backend: add request id logging context to error responses
+Backend update 22: backend: sanitize user profile update payload fields
+Backend update 23: backend: prevent sensitive fields from leaking in user responses
+Backend update 24: backend: add schema indexes for booking and vehicle lookups
+Backend update 25: backend: improve seed script idempotency for local development
+Backend update 26: backend: add route-level input validation for auth endpoints
