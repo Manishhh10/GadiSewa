@@ -8,3 +8,7 @@ build
 *.log
 .DS_Store
 *.tsbuildinfo
+docs/
+README.md
+README.ms
+readme.ms
