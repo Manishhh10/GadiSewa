@@ -8,3 +8,13 @@ Frontend update 7: frontend: sprint workflow update 7/40
 Frontend update 8: frontend: sprint workflow update 8/40
 Frontend update 9: frontend: sprint workflow update 9/40
 Frontend update 10: frontend: sprint workflow update 10/40
+Frontend update 1: frontend: set up route guards for protected dashboard and vendor pages
+Frontend update 2: frontend: refactor navbar auth state handling for login and logout flows
+Frontend update 3: frontend: add vehicle card price and availability badges on listing grid
+Frontend update 4: frontend: implement booking panel date range picker with disabled dates
+Frontend update 5: frontend: handle backend validation errors on register form submission
+Frontend update 6: frontend: add forgot-password and otp verification request states
+Frontend update 7: frontend: optimize homepage hero and featured vehicles for mobile layout
+Frontend update 8: frontend: integrate vendor application api with form submission feedback
+Frontend update 9: frontend: create admin applications table with status filter controls
+Frontend update 10: frontend: add loading skeletons for dashboard stats and bookings list
