@@ -37,3 +37,16 @@ Backend update 23: backend: prevent sensitive fields from leaking in user respon
 Backend update 24: backend: add schema indexes for booking and vehicle lookups
 Backend update 25: backend: improve seed script idempotency for local development
 Backend update 26: backend: add route-level input validation for auth endpoints
+Backend update 27: backend: add validation for vendor application document metadata
+Backend update 28: backend: enforce numeric range checks for vehicle deposit amount
+Backend update 29: backend: add sorting options to vehicle listing endpoint
+Backend update 30: backend: improve booking controller cancellation edge-case handling
+Backend update 31: backend: add admin metrics for pending approvals and disputes
+Backend update 32: backend: normalize date parsing in booking availability endpoints
+Backend update 33: backend: improve mongoose model defaults for booking timestamps
+Backend update 34: backend: add defensive null checks in stats aggregation pipeline
+Backend update 35: backend: optimize vendor route response payload size
+Backend update 36: backend: add consistent api envelope for success responses
+Backend update 37: backend: improve auth controller otp verification error states
+Backend update 38: backend: add fallback handling for missing optional query params
+Backend update 39: backend: tighten tsconfig settings for backend type safety

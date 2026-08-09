@@ -28,3 +28,13 @@ Frontend update 17: frontend: improve accessibility labels and keyboard flow for
 Frontend update 18: frontend: add reusable error banner component for api request failures
 Frontend update 19: frontend: implement optimistic ui update for booking status changes
 Frontend update 20: frontend: add pagination and sort controls to admin listings view
+Frontend update 21: frontend: standardize currency and date formatting across booking pages
+Frontend update 22: frontend: add vendor profile completion checklist on vendor dashboard
+Frontend update 23: frontend: implement image lazy loading and aspect-ratio placeholders
+Frontend update 24: frontend: reduce layout shift on booking confirmation and receipt blocks
+Frontend update 25: frontend: add dispute detail page error and retry handling states
+Frontend update 26: frontend: integrate lucide-react icons for sidebar and quick actions
+Frontend update 27: frontend: add dark mode support with css variables and theme toggle
+Frontend update 28: frontend: sync theme preference with local storage and initial render
+Frontend update 29: frontend: improve contrast ratios for text and buttons in dark mode
+Frontend update 30: frontend: add password strength meter and helper hints on signup
